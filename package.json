@@ -1,7 +1,7 @@
 {
-  "name": "@bemedev///TODO",
+  "name": "@bemedev/app-solid",
   "version": "0.0.1",
-  "description": "//TODO",
+  "description": "Middleware between @bemedev/app-ts and solidjs",
   "author": {
     "email": "bri_lvi@icloud.com",
     "name": "chlbri",
@@ -79,6 +79,8 @@
     }
   ],
   "devDependencies": {
+    "@bemedev/app-ts": "0.1.23-beta",
+    "@bemedev/decompose": "^0.8.1",
     "@bemedev/fsf": "^0.8.0",
     "@bemedev/rollup-config": "^0.1.1",
     "@bemedev/vitest-alias": "^0.0.3",
@@ -108,5 +110,8 @@
     "onlyBuiltDependencies": [
       "esbuild"
     ]
+  },
+  "peerDependencies": {
+    "solid-js": "^1.9.7"
   }
 }
