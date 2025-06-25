@@ -8,7 +8,7 @@ import {
   type PrivateContextFrom,
   type State,
 } from '@bemedev/app-ts';
-import { decomposeSV } from '@bemedev/decompose';
+import { decomposeSV } from '@bemedev/app-ts/lib/utils';
 import { createMemo, createRoot, from, type Accessor } from 'solid-js';
 import { defaultSelector } from './default';
 

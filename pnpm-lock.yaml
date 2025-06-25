@@ -15,9 +15,6 @@ importers:
       '@bemedev/app-ts':
         specifier: 0.1.23-beta
         version: 0.1.23-beta
-      '@bemedev/decompose':
-        specifier: ^0.8.1
-        version: 0.8.1(@bemedev/types@0.1.5)
       '@bemedev/fsf':
         specifier: ^0.8.0
         version: 0.8.0

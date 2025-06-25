@@ -80,7 +80,6 @@
   ],
   "devDependencies": {
     "@bemedev/app-ts": "0.1.23-beta",
-    "@bemedev/decompose": "^0.8.1",
     "@bemedev/fsf": "^0.8.0",
     "@bemedev/rollup-config": "^0.1.1",
     "@bemedev/vitest-alias": "^0.0.3",
