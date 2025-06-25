@@ -8,7 +8,8 @@ import {
   type PrivateContextFrom,
   type State,
 } from '@bemedev/app-ts';
-import { decomposeSV } from '@bemedev/app-ts/lib/utils';
+import { DEFAULT_DELIMITER } from '@bemedev/app-ts/lib/constants';
+import { decomposeSV, replaceAll } from '@bemedev/app-ts/lib/utils';
 import { createMemo, createRoot, from, type Accessor } from 'solid-js';
 import { defaultSelector } from './default';
 
@@ -96,9 +97,17 @@ export const interpret = <M extends AnyMachine>(
     );
   };
 
+  const mapper = (entry: string): string => {
+    return replaceAll({
+      entry,
+      match: '.',
+      replacement: DEFAULT_DELIMITER,
+    });
+  };
+
   const matches = (...values: string[]) => {
     return () => {
-      const dps = decomposeSV(value());
+      const dps = decomposeSV(value()).map(mapper);
       const out = values.every(value => dps.includes(value));
 
       return out;
@@ -107,7 +116,7 @@ export const interpret = <M extends AnyMachine>(
 
   const contains = (...values: string[]) => {
     return () => {
-      const dps = decomposeSV(value());
+      const dps = decomposeSV(value()).map(mapper);
       const out = values.every(value =>
         dps.every(dp => dp.includes(value)),
       );
