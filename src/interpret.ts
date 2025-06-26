@@ -9,6 +9,7 @@ import {
   type State,
 } from '@bemedev/app-ts';
 
+import { DEFAULT_DELIMITER } from '@bemedev/app-ts/lib/constants';
 import { INIT_EVENT } from '@bemedev/app-ts/lib/events';
 import { decomposeSV, replaceAll } from '@bemedev/app-ts/lib/utils';
 import { createMemo, createRoot, from, type Accessor } from 'solid-js';
@@ -48,12 +49,15 @@ export const interpret = <M extends AnyMachine>(
 
   const state = <T>(
     ...[accessor = defaultSelector, equals]: GetProps<T>
-  ) =>
-    createRoot(() =>
+  ) => {
+    const out = createRoot(() =>
       createMemo(() => accessor(store()), accessor(initialState), {
         equals,
       }),
     );
+
+    return out;
+  };
 
   const reducer = <T>(accessor: Required<GetProps<T>>[0]) => {
     const stateAccessor = accessor;
@@ -70,12 +74,11 @@ export const interpret = <M extends AnyMachine>(
     return reduceS;
   };
 
-  // service.send
-
   const context = reducer(state => state.context);
   const send = service.send;
   const mode = state(state => state.mode);
   const value = state(state => state.value);
+  const dps = () => decomposeSV(value()).map(mapper);
   const status = state(state => state.status);
   const tags = state(state => state.tags);
 
@@ -89,27 +92,30 @@ export const interpret = <M extends AnyMachine>(
   ) => Accessor<R>;
 
   const select: Select = (selector, equals) => {
-    const _context = state(state => state.context);
+    const context = state(state => state.context);
 
-    return createMemo(
-      () => getByKey(_context(), selector),
-      getByKey(initialState, selector),
-      { equals },
+    const out = createRoot(() =>
+      createMemo(
+        () => getByKey(context(), selector),
+        getByKey(initialState, selector),
+        { equals },
+      ),
     );
+
+    return out;
   };
 
   const mapper = (entry: string): string => {
     return replaceAll({
       entry,
       match: '.',
-      replacement: '/',
+      replacement: DEFAULT_DELIMITER,
     });
   };
 
   const matches = (...values: string[]) => {
     return () => {
-      const dps = decomposeSV(value()).map(mapper);
-      const out = values.every(value => dps.includes(value));
+      const out = values.every(value => dps().includes(value));
 
       return out;
     };
@@ -117,9 +123,8 @@ export const interpret = <M extends AnyMachine>(
 
   const contains = (...values: string[]) => {
     return () => {
-      const dps = decomposeSV(value()).map(mapper);
       const out = values.every(value =>
-        dps.every(dp => dp.includes(value)),
+        dps().every(dp => dp.includes(value)),
       );
 
       return out;
@@ -129,19 +134,20 @@ export const interpret = <M extends AnyMachine>(
   const allValues = Object.keys(machine.preflat);
 
   return {
-    state,
-    reducer,
-    context,
-    status,
-    send,
-    mode,
-    value,
-    tags,
-    start,
-    stop,
-    select,
-    matches,
-    contains,
     allValues,
+    contains,
+    context,
+    dps,
+    matches,
+    mode,
+    reducer,
+    select,
+    send,
+    start,
+    state,
+    status,
+    stop,
+    tags,
+    value,
   };
 };
