@@ -8,7 +8,8 @@ import {
   type PrivateContextFrom,
   type State,
 } from '@bemedev/app-ts';
-import { DEFAULT_DELIMITER } from '@bemedev/app-ts/lib/constants';
+
+import { INIT_EVENT } from '@bemedev/app-ts/lib/events';
 import { decomposeSV, replaceAll } from '@bemedev/app-ts/lib/utils';
 import { createMemo, createRoot, from, type Accessor } from 'solid-js';
 import { defaultSelector } from './default';
@@ -31,7 +32,7 @@ export const interpret = <M extends AnyMachine>(
     mode: service.mode,
     status: 'idle',
     value: service.initialValue,
-    event: 'machine$$init',
+    event: INIT_EVENT,
   };
 
   const _store = createRoot(() => from(service));
@@ -101,7 +102,7 @@ export const interpret = <M extends AnyMachine>(
     return replaceAll({
       entry,
       match: '.',
-      replacement: DEFAULT_DELIMITER,
+      replacement: '/',
     });
   };
 
