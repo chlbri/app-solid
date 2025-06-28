@@ -9,7 +9,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "//TODO"
+    "url": "https://github.com/chlbri/app-solid"
   },
   "license": "MIT",
   "type": "module",
@@ -31,7 +31,12 @@
     }
   ],
   "keywords": [
-    "//TODO"
+    "app",
+    "state-machines",
+    "solidjs",
+    "bemedev",
+    "middleware",
+    "reactivity"
   ],
   "files": [
     "lib",

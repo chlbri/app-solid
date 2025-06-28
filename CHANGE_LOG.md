@@ -3,9 +3,10 @@
 <br/>
 <br/>
 
-### Version [0.0.1] --> _date & hour_
+### Version [0.0.1] --> _2025/06/28 19:15_
 
 - ✨ Première version de la bibliothèque
+- **_100%_** de coverage des tests
 
 <br/>
 

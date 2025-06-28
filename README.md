@@ -1,4 +1,4 @@
-# Beatifull lib
+# @bemedev/app-solid
 
 A beautifull description
 
@@ -16,9 +16,7 @@ MIT
 ...
 </summary>
 
-### Version [0.0.1] --> _date & hour_
-
-- ✨ Première version de la bibliothèque
+[CHANGELOG](https://github.com/chlbri/app-solid/blob/main/CHANGE_LOG.md)
 
 </details>
 
