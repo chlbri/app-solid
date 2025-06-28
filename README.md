@@ -1,6 +1,39 @@
 # @bemedev/app-solid
 
-A beautifull description
+<br/>
+
+A TypeScript middleware for integrating `@bemedev/app-ts` finite state machines with SolidJS.
+
+<br/>
+
+## Description
+
+This library serves as a bridge between `@bemedev/app-ts` (finite state machine library) and SolidJS, enabling the use of reactive state machines in SolidJS applications.
+
+<br/>
+
+## Key Features
+
+- 🔗 **SolidJS Integration**: Connects `@bemedev/app-ts` state machines with SolidJS signals
+- ⚡ **Reactivity**: Automatic synchronization between machine state and SolidJS components
+- 🎯 **TypeScript Types**: Preserves type safety between both libraries
+- 🔄 **Transparent Middleware**: Simple interface for using state machines in SolidJS
+
+<br/>
+
+## Installation
+
+### npm
+
+```bash
+npm install @bemedev/app-solid @bemedev/app-ts solid-js
+```
+
+### pnpm
+
+```bash
+pnpm install @bemedev/app-solid @bemedev/app-ts solid-js
+```
 
 <br/>
 

@@ -1,6 +1,6 @@
 {
   "name": "@bemedev/app-solid",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Middleware between @bemedev/app-ts and solidjs",
   "author": {
     "email": "bri_lvi@icloud.com",
