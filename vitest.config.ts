@@ -6,13 +6,14 @@ import tsconfig from './tsconfig.json';
 export default defineConfig({
   plugins: [
     aliasTs(tsconfig as any),
-    exclude({ ignoreCoverageFiles: ['**/index.ts'] }),
+    exclude({ ignoreCoverageFiles: ['**/index.ts', 'src/types.ts'] }),
   ],
   test: {
     bail: 10,
     maxConcurrency: 10,
     passWithNoTests: true,
     slowTestThreshold: 3000,
+    environment: 'jsdom',
     globals: true,
     logHeapUsage: true,
     coverage: {

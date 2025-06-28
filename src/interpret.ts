@@ -2,35 +2,25 @@ import {
   interpret as _interpret,
   getByKey,
   type AnyMachine,
-  type ContextFrom,
   type Decompose2,
-  type Mode,
-  type PrivateContextFrom,
   type State,
 } from '@bemedev/app-ts';
 
-import { DEFAULT_DELIMITER } from '@bemedev/app-ts/lib/constants';
+import { DEFAULT_DELIMITER as replacement } from '@bemedev/app-ts/lib/constants';
 import { INIT_EVENT } from '@bemedev/app-ts/lib/events';
 import { decomposeSV, replaceAll } from '@bemedev/app-ts/lib/utils';
 import { createMemo, createRoot, from, type Accessor } from 'solid-js';
 import { defaultSelector } from './default';
 
 export const interpret = <M extends AnyMachine>(
-  machine: M,
-  config: {
-    pContext: PrivateContextFrom<M>;
-    context: ContextFrom<M>;
-    mode?: Mode;
-    exact?: boolean;
-  },
+  ...[machine, config]: Parameters<typeof _interpret<M>>
 ) => {
-  const service = _interpret(machine, config as any);
+  const service = _interpret(machine, config);
 
   type Tc = (typeof config)['context'];
 
   const initialState: State<Tc> = {
     context: service.context,
-    mode: service.mode,
     status: 'idle',
     value: service.initialValue,
     event: INIT_EVENT,
@@ -47,14 +37,12 @@ export const interpret = <M extends AnyMachine>(
     equals?: (prev: T, next: T) => boolean,
   ];
 
-  const state = <T>(
+  const state = <T = State<Tc>>(
     ...[accessor = defaultSelector, equals]: GetProps<T>
   ) => {
-    const out = createRoot(() =>
-      createMemo(() => accessor(store()), accessor(initialState), {
-        equals,
-      }),
-    );
+    const out = createMemo(() => accessor(store()), undefined, {
+      equals,
+    });
 
     return out;
   };
@@ -76,12 +64,16 @@ export const interpret = <M extends AnyMachine>(
 
   const context = reducer(state => state.context);
   const send = service.send;
-  const mode = state(state => state.mode);
-  const value = state(state => state.value);
+  const value = () => state(state => state.value)();
+
+  const mapper = (entry: string) =>
+    replaceAll({ entry, match: '.', replacement });
+
   const dps = () => decomposeSV(value()).map(mapper);
   const status = state(state => state.status);
-  const tags = state(state => state.tags);
+  const tags = () => state(state => state.tags)();
 
+  // #region select
   type Select = <
     D extends Decompose2<Tc>,
     K extends Extract<keyof D, string>,
@@ -92,7 +84,7 @@ export const interpret = <M extends AnyMachine>(
   ) => Accessor<R>;
 
   const select: Select = (selector, equals) => {
-    const context = state(state => state.context);
+    const context = () => state(state => state.context)();
 
     const out = createRoot(() =>
       createMemo(
@@ -104,14 +96,7 @@ export const interpret = <M extends AnyMachine>(
 
     return out;
   };
-
-  const mapper = (entry: string): string => {
-    return replaceAll({
-      entry,
-      match: '.',
-      replacement: DEFAULT_DELIMITER,
-    });
-  };
+  // #endregion
 
   const matches = (...values: string[]) => {
     return () => {
@@ -131,15 +116,13 @@ export const interpret = <M extends AnyMachine>(
     };
   };
 
-  const allValues = Object.keys(machine.preflat);
+  const values = Object.keys(machine.preflat);
 
   return {
-    allValues,
     contains,
     context,
     dps,
     matches,
-    mode,
     reducer,
     select,
     send,
@@ -149,5 +132,6 @@ export const interpret = <M extends AnyMachine>(
     stop,
     tags,
     value,
+    values,
   };
 };
