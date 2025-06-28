@@ -31,6 +31,8 @@ export const interpret = <M extends AnyMachine>(
 
   const start = service.start;
   const stop = service.stop;
+  const pause = service.pause;
+  const resume = service.resume;
 
   type GetProps<T = any, S = ReturnType<typeof store>> = [
     accessor?: (state: S) => T,
@@ -84,7 +86,7 @@ export const interpret = <M extends AnyMachine>(
   ) => Accessor<R>;
 
   const select: Select = (selector, equals) => {
-    const context = () => state(state => state.context)();
+    const context = state(state => state.context);
 
     const out = createRoot(() =>
       createMemo(
@@ -117,19 +119,27 @@ export const interpret = <M extends AnyMachine>(
   };
 
   const values = Object.keys(machine.preflat);
+  const subscribe = service.subscribe;
+  const subscribeMap = service.subscribeMap;
+  const dispose = service[Symbol.asyncDispose];
 
   return {
     contains,
     context,
+    dispose,
     dps,
     matches,
+    pause,
     reducer,
+    resume,
     select,
     send,
     start,
     state,
     status,
     stop,
+    subscribe,
+    subscribeMap,
     tags,
     value,
     values,
