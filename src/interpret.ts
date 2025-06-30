@@ -1,10 +1,18 @@
 import {
   interpret as _interpret,
   getByKey,
+  type AddOptions_F,
   type AnyMachine,
+  type ContextFrom,
   type Decompose2,
+  type EventsMapFrom,
+  type MachineOptionsFrom,
+  type PrivateContextFrom,
+  type PromiseesMapFrom,
   type State,
 } from '@bemedev/app-ts';
+
+import {} from '@bemedev/app-ts/lib/';
 
 import { DEFAULT_DELIMITER as replacement } from '@bemedev/app-ts/lib/constants';
 import { INIT_EVENT } from '@bemedev/app-ts/lib/events';
@@ -122,6 +130,13 @@ export const interpret = <M extends AnyMachine>(
   const subscribe = service.subscribe;
   const subscribeMap = service.subscribeMap;
   const dispose = service[Symbol.asyncDispose];
+  const addOptions: AddOptions_F<
+    EventsMapFrom<M>,
+    PromiseesMapFrom<M>,
+    PrivateContextFrom<M>,
+    ContextFrom<M>,
+    Omit<MachineOptionsFrom<M>, 'initials'>
+  > = service.addOptions as any;
 
   return {
     contains,
@@ -143,5 +158,6 @@ export const interpret = <M extends AnyMachine>(
     tags,
     value,
     values,
+    addOptions,
   };
 };
