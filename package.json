@@ -84,7 +84,7 @@
     }
   ],
   "devDependencies": {
-    "@bemedev/app-ts": "0.2.4",
+    "@bemedev/app-ts": "0.2.6",
     "@bemedev/fsf": "^0.8.0",
     "@bemedev/rollup-config": "^0.1.1",
     "@bemedev/sleep": "^0.1.2",
@@ -97,9 +97,9 @@
     "@solidjs/testing-library": "^0.8.10",
     "@testing-library/jest-dom": "^6.6.3",
     "@testing-library/user-event": "^14.6.1",
-    "@types/node": "^24.0.7",
-    "@typescript-eslint/eslint-plugin": "^8.35.0",
-    "@typescript-eslint/parser": "^8.35.0",
+    "@types/node": "^24.0.8",
+    "@typescript-eslint/eslint-plugin": "^8.35.1",
+    "@typescript-eslint/parser": "^8.35.1",
     "@vitest/coverage-v8": "^3.2.4",
     "eslint": "^9.30.0",
     "glob": "^11.0.3",
