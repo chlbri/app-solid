@@ -6,14 +6,10 @@ settings:
 
 importers:
   .:
-    dependencies:
-      solid-js:
-        specifier: ^1.9.7
-        version: 1.9.7
     devDependencies:
       '@bemedev/app-ts':
-        specifier: ^0.5.3
-        version: 0.5.3
+        specifier: ^0.5.4
+        version: 0.5.4
       '@bemedev/fsf':
         specifier: ^0.8.0
         version: 0.8.0
@@ -95,6 +91,9 @@ importers:
       size-limit:
         specifier: ^11.2.0
         version: 11.2.0
+      solid-js:
+        specifier: ^1.9.7
+        version: 1.9.7
       tslib:
         specifier: ^2.8.1
         version: 2.8.1
@@ -175,10 +174,10 @@ packages:
       }
     engines: { node: '>=18' }
 
-  '@bemedev/app-ts@0.5.3':
+  '@bemedev/app-ts@0.5.4':
     resolution:
       {
-        integrity: sha512-e3jafMFUU1PD1f76FLjFfhFMBMgAzXPpPk9820eZXeHEP7suj209Yagwew3InGd4+4WyiZ0llOfyIlpvI51www==,
+        integrity: sha512-h8vDEj+Kpx56ploelB2T33I6rQEPQbn5RrubhmecNmzu+VSuIpyBnUW4OyH0evMq2/StpxxEluvmdQ6wfbJxeA==,
       }
     engines: { node: '>=20' }
 
@@ -3193,7 +3192,7 @@ snapshots:
 
   '@bcoe/v8-coverage@1.0.2': {}
 
-  '@bemedev/app-ts@0.5.3':
+  '@bemedev/app-ts@0.5.4':
     dependencies:
       '@bemedev/basifun': 0.5.2(@bemedev/types@0.2.6)
       '@bemedev/boolean-recursive': 0.0.3
