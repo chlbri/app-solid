@@ -3,6 +3,17 @@
 <br/>
 <br/>
 
+<details>
+<summary> [0.0.3] - 2025/07/14 => 16:10</summary>
+
+- tests(js): 100% coverage
+- tests(ts): 100% coverage
+- Upgrade deps
+
+</details>
+
+<br/>
+
 ### Version [0.0.1] --> _2025/06/28 19:15_
 
 - ✨ Première version de la bibliothèque
