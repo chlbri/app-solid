@@ -1,5 +1,9 @@
-import { createConfig, createMachine, EVENTS_FULL } from '@bemedev/app-ts';
-import { typings } from '@bemedev/app-ts/lib/utils';
+import {
+  createConfig,
+  createMachine,
+  EVENTS_FULL,
+  typings,
+} from '@bemedev/app-ts';
 import { DELAY } from './constants';
 import { fakeDB } from './fakeDB';
 import { machine1 } from './machine1';
@@ -97,39 +101,54 @@ export const machine21 = createMachine(
     machines: 'machine1',
     ...config21,
   },
-  {
+  typings({
     eventsMap: {
-      NEXT: typings.object,
-      FETCH: typings.object,
-      WRITE: { value: typings.string() },
-      SEND: typings.object,
+      NEXT: 'primitive',
+      FETCH: 'primitive',
+      WRITE: { value: 'string' },
+      SEND: 'primitive',
     },
     context: {
-      iterator: typings.number(),
-      input: typings.string(),
-      data: typings.array(typings.string()),
+      iterator: 'number',
+      input: 'string',
+      data: ['string'],
     },
-    pContext: typings.recordAll(typings.number(), 'iterator'),
+    pContext: {
+      iterator: 'number',
+    },
     promiseesMap: {
-      fetch: typings.promiseDef(
-        typings.array(typings.string()),
-        typings.object,
-      ),
+      fetch: {
+        then: ['string'],
+        catch: 'primitive',
+      },
     },
-  },
+  }),
   { '/': 'idle', '/working/fetch': 'idle', '/working/ui': 'idle' },
 ).provideOptions(
-  ({ isNotValue, isValue, createChild, assign, voidAction, sender }) => ({
+  ({
+    isNotValue,
+    isValue,
+    createChild,
+    assign,
+    voidAction,
+    sendTo: sender,
+  }) => ({
     actions: {
-      inc: assign('context.iterator', (_, { iterator }) => iterator + 1),
-      inc2: assign('context.iterator', (_, { iterator }) => iterator + 4),
+      inc: assign(
+        'context.iterator',
+        ({ context: { iterator } }) => iterator + 1,
+      ),
+      inc2: assign(
+        'context.iterator',
+        ({ context: { iterator } }) => iterator + 4,
+      ),
       sendPanelToUser: voidAction(() => console.log('sendPanelToUser')),
       askUsertoInput: voidAction(() => console.log('Input, please !!')),
       write: assign('context.input', {
-        WRITE: (_, __, { value }) => value,
+        WRITE: ({ payload: { value } }) => value,
       }),
       insertData: assign('context.data', {
-        'fetch::then': (_, { data }, payload) => {
+        'fetch::then': ({ payload, context: { data } }) => {
           data.push(...payload);
           return data;
         },
@@ -141,7 +160,7 @@ export const machine21 = createMachine(
       isInputNotEmpty: isNotValue('context.input', ''),
     },
     promises: {
-      fetch: async (_, { input }) => {
+      fetch: async ({ context: { input } }) => {
         return fakeDB.filter(item => item.name.includes(input));
       },
     },

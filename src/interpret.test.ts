@@ -1,9 +1,9 @@
+import { createMachine, typings } from '@bemedev/app-ts';
 import type { StateValue } from '@bemedev/app-ts/lib/states';
 import { deepEqual, nothing } from '@bemedev/app-ts/lib/utils';
 import { createFakeWaiter } from '@bemedev/vitest-extended';
 import { renderHook } from '@solidjs/testing-library';
-import { DELAY, fakeDB, machine1 } from './fixtures';
-import { machine22 } from './fixtures/machine22';
+import { DELAY, fakeDB, machine1, machine22 } from './fixtures';
 import { interpret } from './interpret';
 import { tuple } from './interpret.fixtures';
 
@@ -80,7 +80,6 @@ describe('#01 => machine1', () => {
 
 describe('#02 => machine21', () => {
   const {
-    subscribeMap,
     subscribe,
     select,
     context,
@@ -101,13 +100,10 @@ describe('#02 => machine21', () => {
     exact: true,
   });
 
-  const subscriber = subscribeMap(
+  const subscriber = subscribe(
     {
-      WRITE: ({
-        event: {
-          payload: { value },
-        },
-      }) => console.log('WRITE with', ':', `"${value}"`),
+      WRITE: ({ payload: { value } }) =>
+        console.log('WRITE with', ':', `"${value}"`),
       NEXT: () => console.log('NEXT time, you will see!!'),
       else: nothing,
     },
@@ -562,8 +558,8 @@ describe('#02 => machine21', () => {
       });
     });
 
-    test('#03 => Length of calls of warn is "215"', () => {
-      expect(dumbFn).toBeCalledTimes(215);
+    test('#03 => Length of calls of warn is "181"', () => {
+      expect(dumbFn).toBeCalledTimes(181);
       sub.unsubscribe();
     });
 
@@ -573,4 +569,96 @@ describe('#02 => machine21', () => {
 
     test('#05 => dispose', dispose);
   });
+});
+
+describe('#03 -> machine has a primitive context', () => {
+  const machine = createMachine(
+    {
+      states: {
+        idle: {
+          on: {
+            INC: { actions: 'inc' },
+          },
+        },
+      },
+    },
+    typings({
+      context: 'number',
+      eventsMap: {
+        INC: 'primitive',
+      },
+    }),
+    { '/': 'idle' },
+  ).provideOptions(({ assign }) => ({
+    actions: {
+      inc: assign('context', ({ context }) => context + 1),
+    },
+  }));
+
+  let iterator = 0;
+  let value: StateValue;
+
+  const {
+    start,
+    context,
+    send,
+    value: _value,
+    select,
+    dispose,
+  } = interpret(machine, {
+    context: 0,
+    pContext: {},
+  });
+
+  // #region Use FakeTimers
+  beforeAll(() => vi.useFakeTimers());
+  // #endregion
+
+  beforeEach(() => {
+    const { result } = renderHook(context());
+    iterator = result;
+  });
+
+  beforeEach(() => {
+    const { result } = renderHook(_value);
+    value = result;
+  });
+
+  test('#00 => select is undefined', () => {
+    expect(select).toBeUndefined();
+  });
+
+  test('#01 => Start the machine', () => {
+    start();
+  });
+
+  it('#02 => Just after start, "iterator" is "0"', () => {
+    expect(iterator).toEqual(0);
+  });
+
+  it('#03 => Value is "idle"', () => {
+    expect(value).toBe('idle');
+  });
+
+  it('#04 => send "INC"', () => {
+    send('INC');
+  });
+
+  it('#05 => "iterator" is now "1"', () => {
+    expect(iterator).toBe(1);
+  });
+
+  it('#06 => Value is still "idle"', () => {
+    expect(value).toBe('idle');
+  });
+
+  it('#07 => send "INC"', () => {
+    send('INC');
+  });
+
+  it('#08 => "iterator" is now "2"', () => {
+    expect(iterator).toBe(2);
+  });
+
+  it('#09 => dispose', dispose);
 });

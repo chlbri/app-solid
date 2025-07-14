@@ -2,22 +2,26 @@ import {
   interpret as _interpret,
   getByKey,
   type AnyMachine,
-  type Decompose2,
+  type ContextFrom,
+  type Decompose3,
   type State,
 } from '@bemedev/app-ts';
 
 import { DEFAULT_DELIMITER as replacement } from '@bemedev/app-ts/lib/constants';
 import { INIT_EVENT } from '@bemedev/app-ts/lib/events';
 import { decomposeSV, replaceAll } from '@bemedev/app-ts/lib/utils';
-import { createMemo, createRoot, from, type Accessor } from 'solid-js';
+
+import { createMemo, from, type Accessor } from 'solid-js';
 import { defaultSelector } from './default';
 
-export const interpret = <M extends AnyMachine>(
+type Primitive = string | number | boolean | null | undefined;
+
+export const interpret = <const M extends AnyMachine>(
   ...[machine, config]: Parameters<typeof _interpret<M>>
 ) => {
   const service = _interpret(machine, config);
 
-  type Tc = (typeof config)['context'];
+  type Tc = ContextFrom<M>;
 
   const initialState: State<Tc> = {
     context: service.context,
@@ -26,7 +30,7 @@ export const interpret = <M extends AnyMachine>(
     event: INIT_EVENT,
   };
 
-  const _store = createRoot(() => from(service));
+  const _store = from(service);
   const store = () => _store() ?? initialState;
 
   const start = service.start;
@@ -76,28 +80,33 @@ export const interpret = <M extends AnyMachine>(
   const tags = () => state(state => state.tags)();
 
   // #region select
-  type Select = <
-    D extends Decompose2<Tc>,
-    K extends Extract<keyof D, string>,
+  type _Select = <
+    T = Tc,
+    D = Decompose3<T, { parent: true; sep: '.' }>,
+    K extends Extract<keyof D, string> = Extract<keyof D, string>,
     R = D[K],
   >(
     selector: K,
     equals?: (prev: R, next: R) => boolean,
   ) => Accessor<R>;
 
-  const select: Select = (selector, equals) => {
+  const _select: _Select = (selector, equals) => {
     const context = state(state => state.context);
 
-    const out = createRoot(() =>
-      createMemo(
-        () => getByKey(context(), selector),
-        getByKey(initialState, selector),
-        { equals },
-      ),
+    const out = createMemo(
+      () => getByKey(context(), selector),
+      getByKey(initialState, selector),
+      { equals },
     );
 
     return out;
   };
+
+  type Select = Tc extends Primitive ? undefined : _Select;
+
+  const select: Select = (
+    typeof service.context !== 'object' ? undefined : _select
+  ) as any;
   // #endregion
 
   const matches = (...values: string[]) => {
@@ -120,8 +129,8 @@ export const interpret = <M extends AnyMachine>(
 
   const values = Object.keys(machine.preflat);
   const subscribe = service.subscribe;
-  const subscribeMap = service.subscribeMap;
   const dispose = service[Symbol.asyncDispose];
+  const addOptions = service.addOptions;
 
   return {
     contains,
@@ -139,9 +148,9 @@ export const interpret = <M extends AnyMachine>(
     status,
     stop,
     subscribe,
-    subscribeMap,
     tags,
     value,
     values,
-  };
+    addOptions,
+  } as const;
 };
