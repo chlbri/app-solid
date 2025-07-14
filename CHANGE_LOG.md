@@ -4,6 +4,16 @@
 <br/>
 
 <details>
+<summary> [0.1.2] - 2025/07/14 => 23:15</summary>
+
+- tests(js): 100% coverage
+- tests(ts): 100% coverage
+- Upgrade deps
+- Fix some functions
+
+</details>
+
+<details>
 <summary> [0.1.1] - 2025/07/14 => 22:15</summary>
 
 - tests(js): 100% coverage

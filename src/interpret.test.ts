@@ -1,4 +1,8 @@
-import { createMachine, typings } from '@bemedev/app-ts';
+import {
+  createMachine,
+  typings,
+  type WorkingStatus,
+} from '@bemedev/app-ts';
 import type { StateValue } from '@bemedev/app-ts/lib/states';
 import { deepEqual, nothing } from '@bemedev/app-ts/lib/utils';
 import { createFakeWaiter } from '@bemedev/vitest-extended';
@@ -13,7 +17,7 @@ beforeAll(() => {
 
 const TEXT = 'Activities Integration Test';
 
-const waiter = createFakeWaiter.withDefaultDelay(vi, DELAY);
+const useWaiter = createFakeWaiter.withDefaultDelay(vi, DELAY);
 
 describe('#01 => machine1', () => {
   const {
@@ -21,6 +25,8 @@ describe('#01 => machine1', () => {
     context,
     send,
     value: _value,
+    status: _status,
+    dispose,
   } = interpret(machine1, {
     context: { iterator: 0 },
     pContext: {},
@@ -28,6 +34,7 @@ describe('#01 => machine1', () => {
 
   let iterator = 0;
   let value: StateValue = '';
+  let status: WorkingStatus = 'idle';
 
   // #region Use FakeTimers
   beforeAll(() => vi.useFakeTimers());
@@ -43,39 +50,65 @@ describe('#01 => machine1', () => {
     value = result;
   });
 
+  beforeEach(() => {
+    const { result } = renderHook(_status);
+    status = result;
+  });
+
   test('#00 => Start the machine', () => {
     start();
   });
 
-  it('#01 => Just after start, "iterator" is "0"', () => {
+  it('#01 => Just after start, "status" is "started"', () => {
+    expect(status).toBe('working');
+  });
+
+  it('#02 => Just after start, "iterator" is "0"', () => {
     expect(iterator).toEqual(0);
   });
 
-  it('#02 => Value is "idle"', () => {
+  it('#03 => Value is "idle"', () => {
     expect(value).toBe('idle');
   });
 
-  it(...waiter(3, 10));
+  it(...useWaiter(4, 10));
 
-  it('#04 => "iteraror" is now "10"', () => {
+  it('#05 => "iterator" is now "10"', () => {
     expect(iterator).toBe(10);
   });
 
-  it('#05 => Value is still "idle"', () => {
+  it('#06 => Value is still "idle"', () => {
     expect(value).toBe('idle');
   });
 
-  it('#06 => send "NEXT"', () => send('NEXT'));
+  it('#07 => send "NEXT"', () => send('NEXT'));
 
-  it('#07 => value is now "final"', () => {
+  it('#08 => value is now "final"', () => {
     expect(value).toBe('final');
   });
 
-  it(...waiter(8, 10));
+  it(...useWaiter(9, 10));
 
-  it('#09 => "iteraror" is still "10"', () => {
+  it('#10 => "iterator" is still "10"', () => {
     expect(iterator).toBe(10);
   });
+
+  it('#11 => Dispose', dispose);
+
+  it('#12 => "status" is now "idle"', () => {
+    expect(status).toBe('busy');
+  });
+
+  it(...useWaiter(13, 10));
+
+  it('#14 => "iterator" is still "10"', () => {
+    expect(iterator).toBe(10);
+  });
+
+  it('#15 => Value is still "final"', () => {
+    expect(value).toBe('final');
+  });
+  //FIXME: Change status more efficiently in @bemedev/app-ts
 });
 
 describe('#02 => machine21', () => {
@@ -145,8 +178,6 @@ describe('#02 => machine21', () => {
     );
   };
 
-  const useWaiter = createFakeWaiter.withDefaultDelay(vi, DELAY);
-
   const useState = (state: StateValue, index: number) => {
     const invite = `#${index < 10 ? '0' + index : index} => Current state is "${state}"`;
     return tuple(invite, () => {
@@ -158,7 +189,7 @@ describe('#02 => machine21', () => {
   const useIterator = (num: number, index: number) => {
     const invite = `#${index < 10 ? '0' + index : index} => iterator is "${num}"`;
     return tuple(invite, () => {
-      const { result } = renderHook(select('iterator'));
+      const { result } = renderHook(select('context.iterator'));
 
       expect(result).toBe(num);
     });
