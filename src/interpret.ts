@@ -11,7 +11,7 @@ import { DEFAULT_DELIMITER as replacement } from '@bemedev/app-ts/lib/constants'
 import { INIT_EVENT } from '@bemedev/app-ts/lib/events';
 import { decomposeSV, replaceAll } from '@bemedev/app-ts/lib/utils';
 
-import { createMemo, createRoot, from, type Accessor } from 'solid-js';
+import { createMemo, from, type Accessor } from 'solid-js';
 import { defaultSelector } from './default';
 
 type Primitive = string | number | boolean | null | undefined;
@@ -30,7 +30,7 @@ export const interpret = <const M extends AnyMachine>(
     event: INIT_EVENT,
   };
 
-  const _store = createRoot(() => from(service));
+  const _store = from(service);
   const store = () => _store() ?? initialState;
 
   const start = service.start;
@@ -93,12 +93,10 @@ export const interpret = <const M extends AnyMachine>(
   const _select: _Select = (selector, equals) => {
     const context = state(state => state.context);
 
-    const out = createRoot(() =>
-      createMemo(
-        () => getByKey(context(), selector),
-        getByKey(initialState, selector),
-        { equals },
-      ),
+    const out = createMemo(
+      () => getByKey(context(), selector),
+      getByKey(initialState, selector),
+      { equals },
     );
 
     return out;
