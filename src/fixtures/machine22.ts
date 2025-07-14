@@ -1,5 +1,4 @@
 import { createMachine } from '@bemedev/app-ts';
-import { toFunction } from '@bemedev/app-ts/lib/utils';
 import { config2, machine2 } from './machine2';
 
 // #region machine2
@@ -17,5 +16,5 @@ export const machine22 = createMachine(
   machine2.initials,
 );
 
-machine22.addOptions(toFunction<any>(machine2.options));
+machine22.addOptions(() => machine2.options as any);
 // #endregion

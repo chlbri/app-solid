@@ -1,5 +1,9 @@
-import { createConfig, createMachine, EVENTS_FULL } from '@bemedev/app-ts';
-import { typings } from '@bemedev/app-ts/lib/utils';
+import {
+  createConfig,
+  createMachine,
+  EVENTS_FULL,
+  typings,
+} from '@bemedev/app-ts';
 import { DELAY } from './constants';
 import { fakeDB } from './fakeDB';
 import { machine1 } from './machine1';
@@ -95,39 +99,47 @@ export const machine2 = createMachine(
     machines: 'machine1',
     ...config2,
   },
-  {
+  typings({
     eventsMap: {
-      NEXT: typings.object,
-      FETCH: typings.object,
-      WRITE: { value: typings.string() },
-      FINISH: typings.object,
+      NEXT: 'primitive',
+      FETCH: 'primitive',
+      WRITE: { value: 'string' },
+      FINISH: 'primitive',
+    },
+    pContext: {
+      iterator: 'number',
     },
     context: {
-      iterator: typings.number(),
-      input: typings.string(),
-      data: typings.array(typings.string()),
+      iterator: 'number',
+      input: 'string',
+      data: ['string'],
     },
-    pContext: typings.recordAll(typings.number(), 'iterator'),
     promiseesMap: {
-      fetch: typings.promiseDef(
-        typings.array(typings.string()),
-        typings.object,
-      ),
+      fetch: {
+        then: ['string'],
+        catch: 'primitive',
+      },
     },
-  },
+  }),
   { '/': 'idle', '/working/fetch': 'idle', '/working/ui': 'idle' },
 ).provideOptions(
   ({ isNotValue, isValue, createChild, assign, voidAction }) => ({
     actions: {
-      inc: assign('context.iterator', (_, { iterator }) => iterator + 1),
-      inc2: assign('context.iterator', (_, { iterator }) => iterator + 4),
+      inc: assign(
+        'context.iterator',
+        ({ context: { iterator } }) => iterator + 1,
+      ),
+      inc2: assign(
+        'context.iterator',
+        ({ context: { iterator } }) => iterator + 4,
+      ),
       sendPanelToUser: voidAction(() => console.log('sendPanelToUser')),
       askUsertoInput: voidAction(() => console.log('Input, please !!')),
       write: assign('context.input', {
-        WRITE: (_, __, { value }) => value,
+        WRITE: ({ payload: { value } }) => value,
       }),
       insertData: assign('context.data', {
-        'fetch::then': (_, { data }, payload) => {
+        'fetch::then': ({ payload, context: { data } }) => {
           data.push(...payload);
           return data;
         },
@@ -138,7 +150,7 @@ export const machine2 = createMachine(
       isInputNotEmpty: isNotValue('context.input', ''),
     },
     promises: {
-      fetch: async (_, { input }) => {
+      fetch: async ({ context: { input } }) => {
         return fakeDB.filter(item => item.name.includes(input));
       },
     },
@@ -158,6 +170,80 @@ export const machine2 = createMachine(
           contexts: { iterator: 'iterator' },
         },
       ),
+    },
+  }),
+);
+
+const _config2 = createConfig({ ...config2, entry: 'debounce' });
+
+export const _machine2 = createMachine(
+  _config2,
+  typings({
+    eventsMap: {
+      NEXT: 'primitive',
+      FETCH: 'primitive',
+      WRITE: { value: 'string' },
+      FINISH: 'primitive',
+    },
+    pContext: {
+      iterator: 'number',
+    },
+    context: {
+      iterator: 'number',
+      input: 'string',
+      data: ['string'],
+    },
+    promiseesMap: {
+      fetch: {
+        then: ['string'],
+        catch: 'primitive',
+      },
+    },
+  }),
+  { '/': 'idle', '/working/fetch': 'idle', '/working/ui': 'idle' },
+).provideOptions(
+  ({ isNotValue, isValue, assign, voidAction, debounce: _debounce }) => ({
+    actions: {
+      inc: assign(
+        'context.iterator',
+        ({ context: { iterator } }) => iterator + 1,
+      ),
+
+      inc2: assign(
+        'context.iterator',
+        ({ context: { iterator } }) => iterator + 4,
+      ),
+      sendPanelToUser: voidAction(() => console.log('sendPanelToUser')),
+      askUsertoInput: voidAction(() => console.log('Input, please !!')),
+      write: assign('context.input', {
+        WRITE: ({ payload: { value } }) => value,
+      }),
+      insertData: assign('context.data', {
+        'fetch::then': ({ payload, context: { data } }) => {
+          data.push(...payload);
+          return data;
+        },
+      }),
+      debounce: _debounce(
+        assign('context.iterator', () => {
+          console.log('Debounced action executed');
+          return 1000;
+        }),
+        { ms: 10_000, id: 'debounce-action' },
+      ),
+    },
+    predicates: {
+      isInputEmpty: isValue('context.input', ''),
+      isInputNotEmpty: isNotValue('context.input', ''),
+    },
+    promises: {
+      fetch: async ({ context: { input } }) => {
+        return fakeDB.filter(item => item.name.includes(input));
+      },
+    },
+    delays: {
+      DELAY,
+      DELAY2: 2 * DELAY,
     },
   }),
 );
