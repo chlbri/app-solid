@@ -4,6 +4,7 @@ import {
   type AnyMachine,
   type ContextFrom,
   type Decompose3,
+  type EventsFrom,
   type State,
 } from '@bemedev/app-ts';
 
@@ -22,8 +23,11 @@ export const interpret = <const M extends AnyMachine>(
   const service = _interpret(machine, config);
 
   type Tc = ContextFrom<M>;
+  type Ev = EventsFrom<M>;
 
-  const initialState: State<Tc> = {
+  type StateM = State<Tc, Ev>;
+
+  const initialState: StateM = {
     context: service.context,
     status: 'idle',
     value: service.initialValue,
@@ -43,12 +47,16 @@ export const interpret = <const M extends AnyMachine>(
     equals?: (prev: T, next: T) => boolean,
   ];
 
-  const state = <T = State<Tc>>(
+  const state = <T = StateM>(
     ...[accessor = defaultSelector, equals]: GetProps<T>
   ) => {
-    const out = createMemo(() => accessor(store()), undefined, {
-      equals,
-    });
+    const out = createMemo(
+      () => accessor(store()),
+      accessor(initialState),
+      {
+        equals,
+      },
+    );
 
     return out;
   };
@@ -76,12 +84,12 @@ export const interpret = <const M extends AnyMachine>(
     replaceAll({ entry, match: '.', replacement });
 
   const dps = () => decomposeSV(value()).map(mapper);
-  const status = state(state => state.status);
+  const status = () => state(state => state.status)();
   const tags = () => state(state => state.tags)();
 
   // #region select
   type _Select = <
-    T = Tc,
+    T = StateM,
     D = Decompose3<T, { parent: true; sep: '.' }>,
     K extends Extract<keyof D, string> = Extract<keyof D, string>,
     R = D[K],
@@ -91,12 +99,18 @@ export const interpret = <const M extends AnyMachine>(
   ) => Accessor<R>;
 
   const _select: _Select = (selector, equals) => {
-    const context = state(state => state.context);
-
+    const initial = getByKey(initialState, selector);
     const out = createMemo(
-      () => getByKey(context(), selector),
-      getByKey(initialState, selector),
-      { equals },
+      () => {
+        const _state = store();
+        const _out = getByKey(_state, selector);
+
+        return _out;
+      },
+      initial,
+      {
+        equals,
+      },
     );
 
     return out;
