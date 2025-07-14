@@ -108,7 +108,7 @@ describe('#01 => machine1', () => {
   it('#15 => Value is still "final"', () => {
     expect(value).toBe('final');
   });
-  //FIXME: final status in @bemedev/app-ts
+  //FIXME: Change status more efficiently in @bemedev/app-ts
 });
 
 describe('#02 => machine21', () => {
