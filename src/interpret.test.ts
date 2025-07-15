@@ -27,10 +27,7 @@ describe('#01 => machine1', () => {
     value: _value,
     status: _status,
     dispose,
-  } = interpret(machine1, {
-    context: { iterator: 0 },
-    pContext: {},
-  });
+  } = interpret(machine1);
 
   let iterator = 0;
   let value: StateValue = '';
@@ -42,7 +39,7 @@ describe('#01 => machine1', () => {
 
   beforeEach(() => {
     const { result } = renderHook(context(c => c.iterator));
-    iterator = result;
+    iterator = result ?? iterator;
   });
 
   beforeEach(() => {
