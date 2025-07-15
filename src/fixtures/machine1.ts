@@ -4,6 +4,7 @@ import { DELAY } from './constants';
 // #region machine1
 export const machine1 = createMachine(
   {
+    entry: 'init',
     states: {
       idle: {
         activities: {
@@ -20,16 +21,20 @@ export const machine1 = createMachine(
     eventsMap: { NEXT: 'primitive' },
     promiseesMap: {},
     pContext: 'primitive',
-    context: {
+    context: typings.partial({
       iterator: 'number',
-    },
+    }),
   }),
   { '/': 'idle' },
 );
 
 machine1.addOptions(({ assign }) => ({
   actions: {
-    inc: assign('context.iterator', ({ context }) => context.iterator + 1),
+    init: assign('context.iterator', () => 0),
+    inc: assign(
+      'context.iterator',
+      ({ context }) => context.iterator! + 1,
+    ),
   },
   delays: {
     DELAY,

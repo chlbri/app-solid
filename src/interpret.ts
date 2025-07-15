@@ -5,6 +5,8 @@ import {
   type ContextFrom,
   type Decompose3,
   type EventsFrom,
+  type InterpretArgs,
+  type InterpreterFrom,
   type State,
 } from '@bemedev/app-ts';
 
@@ -18,9 +20,9 @@ import { defaultSelector } from './default';
 type Primitive = string | number | boolean | null | undefined;
 
 export const interpret = <const M extends AnyMachine>(
-  ...[machine, config]: Parameters<typeof _interpret<M>>
+  ...[machine, config]: InterpretArgs<M>
 ) => {
-  const service = _interpret(machine, config);
+  const service: InterpreterFrom<M> = (_interpret as any)(machine, config);
 
   type Tc = ContextFrom<M>;
   type Ev = EventsFrom<M>;

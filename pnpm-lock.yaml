@@ -8,8 +8,8 @@ importers:
   .:
     devDependencies:
       '@bemedev/app-ts':
-        specifier: ^0.6.0
-        version: 0.6.0
+        specifier: ^0.8.0
+        version: 0.8.0
       '@bemedev/fsf':
         specifier: ^0.8.0
         version: 0.8.0
@@ -174,10 +174,10 @@ packages:
       }
     engines: { node: '>=18' }
 
-  '@bemedev/app-ts@0.6.0':
+  '@bemedev/app-ts@0.8.0':
     resolution:
       {
-        integrity: sha512-sJXYuiGUtMjkf74HHpn2zLU9GDuxkobjSHOnYf8FuhplxmHJyUpVsK2WtRiThd3GfIDKoBe15sFaBNfoqRhwFw==,
+        integrity: sha512-mSB0D5KTc9aFf1GoUx1NIMD3DT5f2CLM+KlhnlZEix1YTHk7TAviB+E+vqcKx9p+z/i0yN/Y8JaSUyYINcADqQ==,
       }
     engines: { node: '>=20' }
 
@@ -3192,7 +3192,7 @@ snapshots:
 
   '@bcoe/v8-coverage@1.0.2': {}
 
-  '@bemedev/app-ts@0.6.0':
+  '@bemedev/app-ts@0.8.0':
     dependencies:
       '@bemedev/basifun': 0.5.2(@bemedev/types@0.2.6)
       '@bemedev/boolean-recursive': 0.0.3
