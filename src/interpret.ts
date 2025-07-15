@@ -14,7 +14,7 @@ import { DEFAULT_DELIMITER as replacement } from '@bemedev/app-ts/lib/constants'
 import { INIT_EVENT } from '@bemedev/app-ts/lib/events';
 import { decomposeSV, replaceAll } from '@bemedev/app-ts/lib/utils';
 
-import { createMemo, from, type Accessor } from 'solid-js';
+import { createMemo, createRoot, from, type Accessor } from 'solid-js';
 import { defaultSelector } from './default';
 
 type Primitive = string | number | boolean | null | undefined;
@@ -52,12 +52,10 @@ export const interpret = <const M extends AnyMachine>(
   const state = <T = StateM>(
     ...[accessor = defaultSelector, equals]: GetProps<T>
   ) => {
-    const out = createMemo(
-      () => accessor(store()),
-      accessor(initialState),
-      {
+    const out = createRoot(() =>
+      createMemo(() => accessor(store()), accessor(initialState), {
         equals,
-      },
+      }),
     );
 
     return out;
@@ -102,17 +100,19 @@ export const interpret = <const M extends AnyMachine>(
 
   const _select: _Select = (selector, equals) => {
     const initial = getByKey(initialState, selector);
-    const out = createMemo(
-      () => {
-        const _state = store();
-        const _out = getByKey(_state, selector);
+    const out = createRoot(() =>
+      createMemo(
+        () => {
+          const _state = store();
+          const _out = getByKey(_state, selector);
 
-        return _out;
-      },
-      initial,
-      {
-        equals,
-      },
+          return _out;
+        },
+        initial,
+        {
+          equals,
+        },
+      ),
     );
 
     return out;
