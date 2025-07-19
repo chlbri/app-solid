@@ -10,9 +10,9 @@ import {
   type State,
 } from '@bemedev/app-ts';
 
-import { DEFAULT_DELIMITER as replacement } from '@bemedev/app-ts/lib/constants';
+import { DEFAULT_DELIMITER as replacement } from '@bemedev/app-ts/lib/constants/index.js';
 import { INIT_EVENT } from '@bemedev/app-ts/lib/events';
-import { decomposeSV, replaceAll } from '@bemedev/app-ts/lib/utils';
+import { decomposeSV, replaceAll } from '@bemedev/app-ts/lib/utils/index.js';
 
 import { createMemo, from, type Accessor } from 'solid-js';
 import { defaultSelector } from './default';
