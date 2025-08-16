@@ -3,7 +3,6 @@ import {
   getByKey,
   type AnyMachine,
   type ContextFrom,
-  type Decompose3,
   type EventsFrom,
   type InterpretArgs,
   type InterpreterFrom,
@@ -17,10 +16,10 @@ import {
   replaceAll,
 } from '@bemedev/app-ts/lib/utils/index.js';
 
+import type { Decompose } from '@bemedev/decompose';
+import type { types } from '@bemedev/types';
 import { createMemo, createRoot, from, type Accessor } from 'solid-js';
 import { defaultSelector } from './default';
-
-type Primitive = string | number | boolean | null | undefined;
 
 export const interpret = <const M extends AnyMachine>(
   ...[machine, config]: InterpretArgs<M>
@@ -30,7 +29,12 @@ export const interpret = <const M extends AnyMachine>(
   type Tc = ContextFrom<M>;
   type Ev = EventsFrom<M>;
 
-  type StateM = State<Tc, Ev>;
+  type StateM =
+    State<Tc, Ev> extends infer P
+      ? {
+          [Key in keyof P]: P[Key];
+        }
+      : never;
 
   const initialState: StateM = {
     context: service.context,
@@ -90,10 +94,16 @@ export const interpret = <const M extends AnyMachine>(
   const status = () => state(state => state.status)();
   const tags = () => state(state => state.tags)();
 
+  type DecomposedContext = Decompose<
+    Required<{ context: Tc }>,
+    { object: 'both'; start: false }
+  >;
+
+  // type __Select = typeof service.select;
+
   // #region select
   type _Select = <
-    T = StateM,
-    D = Decompose3<T, { parent: true; sep: '.' }>,
+    D = StateM & DecomposedContext,
     K extends Extract<keyof D, string> = Extract<keyof D, string>,
     R = D[K],
   >(
@@ -121,7 +131,7 @@ export const interpret = <const M extends AnyMachine>(
     return out;
   };
 
-  type Select = Tc extends Primitive ? undefined : _Select;
+  type Select = Tc extends types.Primitive ? undefined : _Select;
 
   const select: Select = (
     typeof service.context !== 'object' ? undefined : _select
@@ -146,7 +156,7 @@ export const interpret = <const M extends AnyMachine>(
     };
   };
 
-  const values = Object.keys(machine.preflat);
+  const values = Object.keys(machine.flat);
   const subscribe = service.subscribe;
   const dispose = service[Symbol.asyncDispose];
   const addOptions = service.addOptions;

@@ -2,10 +2,13 @@ import { createConfig, createMachine, typings } from '@bemedev/app-ts';
 
 export const config3 = createConfig({
   description: 'cdd',
+  initial: 'state1',
   states: {
     state1: {
+      initial: 'state11',
       states: {
         state11: {
+          initial: 'state111',
           states: {
             state111: {},
           },
@@ -26,23 +29,30 @@ export const config3 = createConfig({
       },
       on: {
         EVENT: { actions: ['dodo3', 'doré1'] },
-        EVENT2: '/state4',
+        EVENT2: '/',
         EVENT3: { actions: 'dodo5' },
       },
       always: [
-        { actions: 'dodo6', guards: 'guard2', target: '/state3' },
+        {
+          actions: 'dodo6',
+          guards: 'guard2',
+          target: '/state1/state11',
+        },
         {
           actions: ['dodo7', 'doré3', 'doré1'],
           guards: 'guard2',
-          target: '/state3',
+          target: '/state1/state12',
         },
-        '/state1',
+        '/state1/state11',
       ],
       promises: [
         {
           src: 'promise1',
           then: { actions: 'action1' },
-          catch: [{ guards: 'ert', actions: 'action14' }, '/state1'],
+          catch: [
+            { guards: 'ert', actions: 'action14' },
+            '/state1/state12',
+          ],
           finally: [
             {
               actions: 'action13',
@@ -61,7 +71,10 @@ export const config3 = createConfig({
             { actions: 'action4', guards: 'guard2' },
             { actions: 'action3' },
           ],
-          catch: [{ guards: 'ert', actions: 'action15' }, '/state1'],
+          catch: [
+            { guards: 'ert', actions: 'action15' },
+            '/state1/state12',
+          ],
           finally: [
             {
               guards: 'guard',
@@ -88,11 +101,6 @@ export const machine3 = createMachine(
     pContext: { data: 'string' },
     context: { age: 'number' },
   }),
-  {
-    '/': 'state1',
-    '/state1': 'state11',
-    '/state1/state11': 'state111',
-  },
 );
 
 export type Machine3 = typeof machine3;

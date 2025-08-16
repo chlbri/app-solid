@@ -13,8 +13,8 @@ export const machine22 = createMachine(
     pContext: machine2.pContext,
     promiseesMap: machine2.promiseesMap,
   },
-  machine2.initials,
 );
 
 machine22.addOptions(() => machine2.options as any);
+
 // #endregion

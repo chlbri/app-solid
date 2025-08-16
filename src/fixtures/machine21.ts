@@ -11,6 +11,7 @@ import { machine1 } from './machine1';
 // #region machine2
 
 export const config21 = createConfig({
+  initial: 'idle',
   states: {
     idle: {
       activities: {
@@ -32,16 +33,14 @@ export const config21 = createConfig({
       },
       states: {
         fetch: {
+          initial: 'idle',
           states: {
             idle: {
               activities: {
                 DELAY: 'sendPanelToUser',
               },
               on: {
-                FETCH: {
-                  guards: 'isInputNotEmpty',
-                  target: '/working/fetch/fetch',
-                },
+                FETCH: '/working/fetch/fetch',
               },
             },
             fetch: {
@@ -60,6 +59,7 @@ export const config21 = createConfig({
           },
         },
         ui: {
+          initial: 'idle',
           states: {
             idle: {
               on: {
@@ -123,7 +123,6 @@ export const machine21 = createMachine(
       },
     },
   }),
-  { '/': 'idle', '/working/fetch': 'idle', '/working/ui': 'idle' },
 ).provideOptions(
   ({
     isNotValue,
