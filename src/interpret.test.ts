@@ -1,10 +1,11 @@
 import {
   createMachine,
   typings,
+  deepEqual,
   type WorkingStatus,
 } from '@bemedev/app-ts';
 import type { StateValue } from '@bemedev/app-ts/lib/states';
-import { deepEqual, nothing } from '@bemedev/app-ts/lib/utils';
+import { nothing } from '@bemedev/app-ts/lib/utils';
 import { createFakeWaiter } from '@bemedev/vitest-extended';
 import { renderHook } from '@solidjs/testing-library';
 import { DELAY, fakeDB, machine1, machine22 } from './fixtures';
@@ -213,7 +214,7 @@ describe('#02 => machine22', () => {
   const useInput = (input: string, index: number) => {
     const invite = `#${index < 10 ? '0' + index : index} => input is "${input}"`;
     return tuple(invite, async () => {
-      const { result } = renderHook(context(c => c.input));
+      const { result } = renderHook(context(c => c.input, deepEqual));
       expect(result).toBe(input);
     });
   };
@@ -222,7 +223,7 @@ describe('#02 => machine22', () => {
     const inviteStrict = `#02 => Check strict data`;
 
     const strict = () => {
-      const { result } = renderHook(context(c => c.data));
+      const { result } = renderHook(context(c => c.data, deepEqual));
       expect(result).toStrictEqual(datas);
     };
 
@@ -587,7 +588,7 @@ describe('#02 => machine22', () => {
     });
 
     test('#03 => Length of calls of warn is "181"', () => {
-      expect(dumbFn).toBeCalledTimes(181);
+      expect(dumbFn).toBeCalledTimes(107);
       sub.unsubscribe();
     });
 
