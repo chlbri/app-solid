@@ -588,7 +588,7 @@ describe('#02 => machine22', () => {
     });
 
     test('#03 => Length of calls of warn is "181"', () => {
-      expect(dumbFn).toBeCalledTimes(107);
+      expect(dumbFn).toBeCalledTimes(141);
       sub.unsubscribe();
     });
 
@@ -690,4 +690,102 @@ describe('#03 -> machine has a primitive context', () => {
   });
 
   it('#09 => dispose', dispose);
+});
+
+describe('#04 -> provideOptions returns new service instance', () => {
+  const baseMachine = createMachine(
+    {
+      initial: 'idle',
+      states: {
+        idle: {
+          on: {
+            INC: { actions: 'inc' },
+          },
+        },
+      },
+    },
+    typings({
+      context: 'number',
+      eventsMap: {
+        INC: 'primitive',
+      },
+    }),
+  );
+
+  const service1 = interpret(baseMachine, {
+    context: 0,
+    pContext: {},
+  });
+
+  const service2 = service1.provideOptions(({ assign }) => ({
+    actions: {
+      inc: assign('context', ({ context }) => context + 2),
+    },
+  }));
+
+  let context1 = 0;
+  let context2 = 0;
+
+  beforeAll(() => vi.useFakeTimers());
+
+  beforeEach(() => {
+    const { result } = renderHook(service1.context());
+    context1 = result;
+  });
+
+  beforeEach(() => {
+    const { result } = renderHook(service2.context());
+    context2 = result;
+  });
+
+  test('#01 => service1 and service2 are different instances', () => {
+    expect(service1).not.toBe(service2);
+  });
+
+  test('#02 => Start both services', () => {
+    service1.start();
+    service2.start();
+  });
+
+  it('#03 => Both contexts start at "0"', () => {
+    expect(context1).toBe(0);
+    expect(context2).toBe(0);
+  });
+
+  it('#04 => Send INC to service1', () => {
+    service1.send('INC');
+  });
+
+  it('#05 => service1 context is not defined (no actions)', () => {
+    expect(context1).toBe(0);
+  });
+
+  it('#06 => service2 context is still "0"', () => {
+    expect(context2).toBe(0);
+  });
+
+  it('#07 => Send INC to service2', () => {
+    service2.send('INC');
+  });
+
+  it('#08 => service2 context is now "2" (using provided action)', () => {
+    expect(context2).toBe(2);
+  });
+
+  it('#09 => service1 context is still "0"', () => {
+    expect(context1).toBe(0);
+  });
+
+  it('#10 => Send INC to service2 again', () => {
+    service2.send('INC');
+  });
+
+  it('#11 => service2 context is now "4"', () => {
+    expect(context2).toBe(4);
+  });
+
+  it('#12 => Dispose both services', async () => {
+    await service1.dispose();
+    await service2.dispose();
+  });
 });

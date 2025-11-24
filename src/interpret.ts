@@ -21,10 +21,12 @@ import type { types } from '@bemedev/types';
 import { createMemo, createRoot, from, type Accessor } from 'solid-js';
 import { defaultSelector } from './default';
 
-export const interpret = <const M extends AnyMachine>(
-  ...[machine, config]: InterpretArgs<M>
-) => {
-  const service: InterpreterFrom<M> = (_interpret as any)(machine, config);
+type InterpretService<M extends AnyMachine> = InterpreterFrom<M>;
+
+function wrapService<M extends AnyMachine>(
+  service: InterpretService<M>,
+  machine: M,
+): any {
 
   type Tc = ContextFrom<M>;
   type Ev = EventsFrom<M>;
@@ -161,6 +163,14 @@ export const interpret = <const M extends AnyMachine>(
   const dispose = service[Symbol.asyncDispose];
   const addOptions = service.addOptions;
 
+  const provideOptions = (
+    option: Parameters<typeof service.addOptions>[0],
+  ) => {
+    const newService = service.provideOptions(option);
+    // Wrap the new service with the same machine reference
+    return wrapService(newService as any, machine);
+  };
+
   return {
     contains,
     context,
@@ -181,5 +191,13 @@ export const interpret = <const M extends AnyMachine>(
     value,
     values,
     addOptions,
+    provideOptions,
   } as const;
+}
+
+export const interpret = <const M extends AnyMachine>(
+  ...[machine, config]: InterpretArgs<M>
+) => {
+  const service: InterpretService<M> = (_interpret as any)(machine, config);
+  return wrapService(service, machine);
 };
