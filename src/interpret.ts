@@ -187,14 +187,16 @@ export const interpret = <const M extends AnyMachine>(
   ) => Accessor<R>;
 
   const _select: _Select = (selector, equals) => {
-    // Check if selector starts with 'uiThread.'
+    // Handle uiThread signal selection
+    // Type assertions are required because uiThread signals are stored generically
     if (selector.startsWith('uiThread.')) {
       const uiKey = selector.slice('uiThread.'.length);
       const signal = interpreter._uiThread[uiKey];
       if (signal) {
+        // Type assertion: signal accessor matches the expected return type
         return signal[0] as Accessor<any>;
       }
-      // Return undefined accessor if signal not found
+      // Type assertion: undefined accessor for non-existent signals
       return (() => undefined) as Accessor<any>;
     }
 
@@ -262,15 +264,21 @@ export const interpret = <const M extends AnyMachine>(
    * @param key - The key name for the signal
    * @param initialValue - The initial value for the signal
    * @returns The accessor for the created signal
+   *
+   * @remarks
+   * Type assertion is used because signals are stored in a generic Record
+   * to allow different value types per key.
    */
   const registerUiSignal = <T>(
     key: string,
     initialValue: T,
   ): Accessor<T> => {
     if (interpreter._uiThread[key]) {
+      // Return existing signal - type assertion needed due to generic storage
       return interpreter._uiThread[key][0] as Accessor<T>;
     }
     const signal = createSignal<T>(initialValue);
+    // Store signal with generic type for flexible multi-type storage
     interpreter._uiThread[key] = signal as [
       Accessor<unknown>,
       Setter<unknown>,
@@ -282,15 +290,22 @@ export const interpret = <const M extends AnyMachine>(
    * Send an event to update UI thread signals.
    * Has the same signature as the regular send method from service.
    *
-   * @param _event - The event to process, same type as regular send method
+   * The event parameter is intentionally unused in the base implementation.
+   * This function triggers reactive updates on all UI thread signals,
+   * allowing SolidJS to re-evaluate any dependent computations.
+   *
+   * @param _event - The event to process (same type as regular send method)
+   *
+   * @remarks
+   * The event parameter maintains API consistency with the regular send method.
+   * Custom event-based updates can be implemented by accessing uiThread directly
+   * and calling the signal setters with event-specific logic.
    */
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const sendUI = (_event: Parameters<typeof send>[0]): void => {
-    // Notify all UI thread signal handlers about the event
-    // Each signal can implement its own update logic via registered handlers
+    // Trigger reactive updates on all UI thread signals
+    // This allows dependent computations to re-evaluate
     for (const [, setter] of Object.values(interpreter._uiThread)) {
-      // The setter can be used to update signals based on events
-      // This is a no-op by default, signals update via their own setters
       setter((prev: unknown) => prev);
     }
   };
