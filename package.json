@@ -1,6 +1,6 @@
 {
   "name": "@bemedev/app-solid",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "description": "Middleware between @bemedev/app-ts and solidjs",
   "author": {
     "email": "bri_lvi@icloud.com",
@@ -48,7 +48,7 @@
   "scripts": {
     "build": "pnpm rm:lib && pnpm run rollup",
     "ci": "pnpm run config:off && pnpm run lint && pnpm run test && pnpm run prettier && pnpm run p-q",
-    "ci:admin": "pnpm run rm && pnpm run upgrade && pnpm run ci",
+    "ci:admin": "pnpm run rm && pnpm run upgrade:safe && pnpm run ci",
     "clean": "pnpm run rm && pnpm run config",
     "config": "pnpm install",
     "config:off": "pnpm run config --offline",
@@ -72,6 +72,7 @@
     "test:watch": "vitest",
     "approve": "pnpm approve-builds",
     "upgrade": "pnpm upgrade --latest",
+    "upgrade:safe": "pnpm upgrade --latest && pnpm add -D vitest@3.2.4 @vitest/coverage-v8@3.2.4",
     "upgrade:test": "pnpm dlx @bemedev/upgrade-npm-package"
   },
   "size-limit": [
@@ -101,8 +102,8 @@
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/user-event": "^14.6.1",
     "@types/node": "^24.10.1",
-    "@typescript-eslint/eslint-plugin": "^8.47.0",
-    "@typescript-eslint/parser": "^8.47.0",
+    "@typescript-eslint/eslint-plugin": "^8.48.0",
+    "@typescript-eslint/parser": "^8.48.0",
     "@vitest/coverage-v8": "^3.2.4",
     "eslint": "^9.39.1",
     "glob": "^13.0.0",
