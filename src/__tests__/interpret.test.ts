@@ -8,9 +8,9 @@ import type { StateValue } from '@bemedev/app-ts/lib/states';
 import { nothing } from '@bemedev/app-ts/lib/utils';
 import { createFakeWaiter } from '@bemedev/vitest-extended';
 import { renderHook } from '@solidjs/testing-library';
-import { DELAY, fakeDB, machine1, machine22 } from './fixtures';
-import { interpret } from './interpret';
-import { tuple } from './interpret.fixtures';
+import { DELAY, fakeDB, machine1, machine22 } from '../fixtures';
+import { interpret } from '../interpret';
+import { tuple } from '../interpret.fixtures';
 
 beforeAll(() => {
   vi.useFakeTimers();

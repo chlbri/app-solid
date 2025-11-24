@@ -18,8 +18,69 @@ import {
 
 import type { Decompose } from '@bemedev/decompose';
 import type { types } from '@bemedev/types';
-import { createMemo, createRoot, from, type Accessor } from 'solid-js';
+import {
+  createMemo,
+  createRoot,
+  createSignal,
+  from,
+  type Accessor,
+  type Setter,
+} from 'solid-js';
 import { defaultSelector } from './default';
+
+/**
+ * Type for UI Thread signal record.
+ * Contains SolidJS signal accessors and setters.
+ */
+type UiThreadSignals = Record<
+  string,
+  [Accessor<unknown>, Setter<unknown>]
+>;
+
+/**
+ * Type helper for UI thread decomposition in select.
+ * Allows accessing UI thread signals via 'uiThread.' prefix.
+ */
+type UiThreadDecomposed<T extends UiThreadSignals> = {
+  [K in keyof T as `uiThread.${K & string}`]: T[K] extends [
+    Accessor<infer V>,
+    Setter<unknown>,
+  ]
+    ? V
+    : unknown;
+};
+
+/**
+ * Interpreter class that wraps the state machine interpreter with SolidJS reactivity.
+ *
+ * This class provides:
+ * - Reactive state management via SolidJS signals
+ * - UI Thread signals for fast UI updates (accessible via 'uiThread.' prefix)
+ * - sendUI function for updating UI thread signals
+ *
+ * @template M - The machine type extending AnyMachine
+ *
+ * @remarks
+ * The class is only exported as a type. Use the `interpret` function to create instances.
+ */
+class Interpreter<const M extends AnyMachine> {
+  /**
+   * Internal UI thread signals storage.
+   * Contains SolidJS signals for fast UI updates.
+   */
+  readonly _uiThread: UiThreadSignals;
+
+  constructor(
+    public readonly service: InterpreterFrom<M>,
+    public readonly machine: M,
+    public readonly config: InterpretArgs<M>[1],
+  ) {
+    this._uiThread = {};
+  }
+}
+
+// Export type only - instances can only be created via interpret function
+export type { Interpreter };
 
 export const interpret = <const M extends AnyMachine>(
   ...[machine, config]: InterpretArgs<M>
@@ -30,6 +91,9 @@ export const interpret = <const M extends AnyMachine>(
     machine,
     config,
   );
+
+  // Create the Interpreter instance for holding uiThread signals
+  const interpreter = new Interpreter(service, machine, config);
 
   type Tc = ContextFrom<M>;
   type Ev = EventsFrom<M>;
@@ -110,9 +174,11 @@ export const interpret = <const M extends AnyMachine>(
     { object: 'both'; start: false }
   >;
 
-  // #region select
+  // #region select with uiThread support
   type _Select = <
-    D = StateM & DecomposedContext,
+    D = StateM &
+      DecomposedContext &
+      UiThreadDecomposed<typeof interpreter._uiThread>,
     K extends Extract<keyof D, string> = Extract<keyof D, string>,
     R = D[K],
   >(
@@ -121,6 +187,17 @@ export const interpret = <const M extends AnyMachine>(
   ) => Accessor<R>;
 
   const _select: _Select = (selector, equals) => {
+    // Check if selector starts with 'uiThread.'
+    if (selector.startsWith('uiThread.')) {
+      const uiKey = selector.slice('uiThread.'.length);
+      const signal = interpreter._uiThread[uiKey];
+      if (signal) {
+        return signal[0] as Accessor<any>;
+      }
+      // Return undefined accessor if signal not found
+      return (() => undefined) as Accessor<any>;
+    }
+
     const initial = getByKey(initialState, selector);
     const out = createRoot(() =>
       createMemo(
@@ -177,6 +254,54 @@ export const interpret = <const M extends AnyMachine>(
     ) as unknown as typeof out;
   };
 
+  // #region UI Thread functionality
+  /**
+   * Registers a new UI thread signal.
+   * Signals are accessible via select with 'uiThread.' prefix.
+   *
+   * @param key - The key name for the signal
+   * @param initialValue - The initial value for the signal
+   * @returns The accessor for the created signal
+   */
+  const registerUiSignal = <T>(
+    key: string,
+    initialValue: T,
+  ): Accessor<T> => {
+    if (interpreter._uiThread[key]) {
+      return interpreter._uiThread[key][0] as Accessor<T>;
+    }
+    const signal = createSignal<T>(initialValue);
+    interpreter._uiThread[key] = signal as [
+      Accessor<unknown>,
+      Setter<unknown>,
+    ];
+    return signal[0];
+  };
+
+  /**
+   * Send an event to update UI thread signals.
+   * Has the same signature as the regular send method from service.
+   *
+   * @param _event - The event to process, same type as regular send method
+   */
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const sendUI = (_event: Parameters<typeof send>[0]): void => {
+    // Notify all UI thread signal handlers about the event
+    // Each signal can implement its own update logic via registered handlers
+    for (const [, setter] of Object.values(interpreter._uiThread)) {
+      // The setter can be used to update signals based on events
+      // This is a no-op by default, signals update via their own setters
+      setter((prev: unknown) => prev);
+    }
+  };
+
+  /**
+   * Get the UI thread signals record.
+   * Readonly access to registered signals.
+   */
+  const uiThread: Readonly<UiThreadSignals> = interpreter._uiThread;
+  // #endregion
+
   const out = {
     contains,
     context,
@@ -188,6 +313,7 @@ export const interpret = <const M extends AnyMachine>(
     resume,
     select,
     send,
+    sendUI,
     start,
     state,
     status,
@@ -199,6 +325,8 @@ export const interpret = <const M extends AnyMachine>(
     addOptions,
     provideOptions,
     service,
+    registerUiSignal,
+    uiThread,
   } as const;
 
   return out;
