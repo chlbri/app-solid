@@ -4,6 +4,16 @@
 <br/>
 
 <details>
+<summary> [0.2.4] - 2025/08/16 => 01:00</summary>
+
+- Fix typings
+- Upgrade deps
+
+</details>
+
+<br/>
+
+<details>
 <summary> [0.2.3] - 2025/07/19 => 15:15</summary>
 
 - tests(js): 100% coverage

@@ -108,7 +108,7 @@ describe('#01 => machine1', () => {
   //FIXME: Change status more efficiently in @bemedev/app-ts
 });
 
-describe('#02 => machine21', () => {
+describe('#02 => machine22', () => {
   const {
     subscribe,
     select,
@@ -602,6 +602,7 @@ describe('#02 => machine21', () => {
 describe('#03 -> machine has a primitive context', () => {
   const machine = createMachine(
     {
+      initial: 'idle',
       states: {
         idle: {
           on: {
@@ -616,7 +617,6 @@ describe('#03 -> machine has a primitive context', () => {
         INC: 'primitive',
       },
     }),
-    { '/': 'idle' },
   ).provideOptions(({ assign }) => ({
     actions: {
       inc: assign('context', ({ context }) => context + 1),

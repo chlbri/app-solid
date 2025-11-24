@@ -11,6 +11,7 @@ import { machine1 } from './machine1';
 // #region machine2
 
 export const config2 = createConfig({
+  initial: 'idle',
   states: {
     idle: {
       activities: {
@@ -30,6 +31,7 @@ export const config2 = createConfig({
       },
       states: {
         fetch: {
+          initial: 'idle',
           states: {
             idle: {
               activities: {
@@ -58,6 +60,7 @@ export const config2 = createConfig({
           },
         },
         ui: {
+          initial: 'idle',
           states: {
             idle: {
               on: {
@@ -121,7 +124,6 @@ export const machine2 = createMachine(
       },
     },
   }),
-  { '/': 'idle', '/working/fetch': 'idle', '/working/ui': 'idle' },
 ).provideOptions(
   ({ isNotValue, isValue, createChild, assign, voidAction }) => ({
     actions: {
@@ -200,7 +202,6 @@ export const _machine2 = createMachine(
       },
     },
   }),
-  { '/': 'idle', '/working/fetch': 'idle', '/working/ui': 'idle' },
 ).provideOptions(
   ({ isNotValue, isValue, assign, voidAction, debounce: _debounce }) => ({
     actions: {
