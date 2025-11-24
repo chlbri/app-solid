@@ -24,7 +24,12 @@ import { defaultSelector } from './default';
 export const interpret = <const M extends AnyMachine>(
   ...[machine, config]: InterpretArgs<M>
 ) => {
-  const service: InterpreterFrom<M> = (_interpret as any)(machine, config);
+  type InterpretService<M extends AnyMachine> = InterpreterFrom<M>;
+
+  const service: InterpretService<M> = (_interpret as any)(
+    machine,
+    config,
+  );
 
   type Tc = ContextFrom<M>;
   type Ev = EventsFrom<M>;
@@ -57,8 +62,11 @@ export const interpret = <const M extends AnyMachine>(
   ];
 
   const state = <T = StateM>(
-    ...[accessor = defaultSelector, equals]: GetProps<T>
-  ) => {
+    ...[
+      accessor = defaultSelector as (state: StateM) => T,
+      equals,
+    ]: GetProps<T>
+  ): Accessor<T> => {
     const out = createRoot(() =>
       createMemo(() => accessor(store()), accessor(initialState), {
         equals,
@@ -72,9 +80,12 @@ export const interpret = <const M extends AnyMachine>(
     const stateAccessor = accessor;
 
     const reduceS = <R = T>(
-      ...[_accessor = defaultSelector, equals]: GetProps<R, T>
-    ) =>
-      state(_state => {
+      ...[
+        _accessor = defaultSelector as (state: T) => R,
+        equals,
+      ]: GetProps<R, T>
+    ): Accessor<R> =>
+      state((_state: StateM) => {
         const step1 = stateAccessor(_state);
         const step2 = _accessor(step1);
         return step2;
@@ -83,7 +94,7 @@ export const interpret = <const M extends AnyMachine>(
     return reduceS;
   };
 
-  const context = reducer(state => state.context);
+  const context = reducer((state: StateM) => state.context);
   const send = service.send;
   const value = () => state(state => state.value)();
 
@@ -98,8 +109,6 @@ export const interpret = <const M extends AnyMachine>(
     Required<{ context: Tc }>,
     { object: 'both'; start: false }
   >;
-
-  // type __Select = typeof service.select;
 
   // #region select
   type _Select = <
@@ -161,7 +170,14 @@ export const interpret = <const M extends AnyMachine>(
   const dispose = service[Symbol.asyncDispose];
   const addOptions = service.addOptions;
 
-  return {
+  const provideOptions = (...[option]: Parameters<typeof addOptions>) => {
+    return interpret(
+      (machine as any).provideOptions(option),
+      config as any,
+    ) as unknown as typeof out;
+  };
+
+  const out = {
     contains,
     context,
     dispose,
@@ -181,5 +197,9 @@ export const interpret = <const M extends AnyMachine>(
     value,
     values,
     addOptions,
+    provideOptions,
+    service,
   } as const;
+
+  return out;
 };
