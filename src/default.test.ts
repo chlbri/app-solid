@@ -1,7 +1,7 @@
 import { createTests } from '@bemedev/vitest-extended';
 import { defaultSelector } from './default';
 
-describe('#01=> default', () => {
+describe('#01 => default', () => {
   const { acceptation, success } = createTests(defaultSelector);
 
   describe('#00 => Acceptaion', acceptation);

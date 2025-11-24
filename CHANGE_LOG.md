@@ -4,9 +4,18 @@
 <br/>
 
 <details>
-<summary> [0.2.4] - 2025/08/16 => 01:00</summary>
+<summary>
 
-- Fix typings
+<h3>
+
+**[0.3.0]** - 2025/10/04 => _16:30_
+
+</h3>
+
+</summary>
+
+- tests: **100%** coverage
+- better selector typing
 - Upgrade deps
 
 </details>

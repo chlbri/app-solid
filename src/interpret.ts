@@ -108,7 +108,7 @@ export const interpret = <const M extends AnyMachine>(
     R = D[K],
   >(
     selector: K,
-    equals?: (prev: R, next: R) => boolean,
+    equals?: (prev: NoInfer<R>, next: NoInfer<R>) => boolean,
   ) => Accessor<R>;
 
   const _select: _Select = (selector, equals) => {
