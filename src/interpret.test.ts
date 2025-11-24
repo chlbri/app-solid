@@ -589,7 +589,7 @@ describe('#02 => machine22', () => {
 
     // Updated expectation from 107 to 141 due to @bemedev/app-ts v1.4.3 changes
     // The new version triggers additional subscriber notifications during state updates
-    test('#03 => Length of calls of warn is "181"', () => {
+    test('#03 => Length of calls of warn is "107"', () => {
       expect(dumbFn).toBeCalledTimes(141);
       sub.unsubscribe();
     });
