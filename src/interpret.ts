@@ -27,7 +27,6 @@ function wrapService<M extends AnyMachine>(
   service: InterpretService<M>,
   machine: M,
 ): any {
-
   type Tc = ContextFrom<M>;
   type Ev = EventsFrom<M>;
 
@@ -167,8 +166,9 @@ function wrapService<M extends AnyMachine>(
     option: Parameters<typeof service.addOptions>[0],
   ) => {
     const newService = service.provideOptions(option);
-    // Wrap the new service with the same machine reference
-    return wrapService(newService as any, machine);
+    // provideOptions returns a new Interpreter with the same type parameters
+    // We wrap it with the same machine reference to maintain the reactive layer
+    return wrapService(newService as InterpretService<M>, machine);
   };
 
   return {
@@ -198,6 +198,9 @@ function wrapService<M extends AnyMachine>(
 export const interpret = <const M extends AnyMachine>(
   ...[machine, config]: InterpretArgs<M>
 ) => {
-  const service: InterpretService<M> = (_interpret as any)(machine, config);
+  const service: InterpretService<M> = (_interpret as any)(
+    machine,
+    config,
+  );
   return wrapService(service, machine);
 };
