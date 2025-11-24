@@ -8,6 +8,26 @@
 
 <h3>
 
+**[0.4.1]** - 2025/11/24 => _18:30_
+
+</h3>
+
+</summary>
+
+- fix: Update `ci:admin` script to use safe upgrade
+- Upgrade `@typescript-eslint/eslint-plugin` to v8.48.0
+- Upgrade `@typescript-eslint/parser` to v8.48.0
+- <u>Test coverage **_100%_**</u>
+
+</details>
+
+<br/>
+
+<details>
+<summary>
+
+<h3>
+
 **[0.4.0]** - 2025/11/24 => _10:00_
 
 </h3>
