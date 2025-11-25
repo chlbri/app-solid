@@ -209,4 +209,8 @@ export class Interpreter<
     instance.addUIoptions(uiOption);
     return instance;
   };
+
+  dispose = async () => {
+    await this.#service[Symbol.asyncDispose]();
+  };
 }
