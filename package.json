@@ -86,7 +86,7 @@
     }
   ],
   "devDependencies": {
-    "@bemedev/app-ts": "^1.4.3",
+    "@bemedev/app-ts": "^1.4.5",
     "@bemedev/decompose": "1.4.0",
     "@bemedev/fsf": "^1.0.1",
     "@bemedev/rollup-config": "^0.2.2",

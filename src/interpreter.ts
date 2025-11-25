@@ -2,55 +2,37 @@ import {
   decomposeSV,
   interpret,
   type AnyMachine,
-  type ContextFrom,
-  type EventsFrom,
+  type InterpretArgs,
   type InterpreterFrom,
   type InterpreterOptions,
-  type MachineOptionsFrom,
-  type State,
 } from '@bemedev/app-ts';
 import { DEFAULT_DELIMITER as replacement } from '@bemedev/app-ts/lib/constants/index.js';
 import { INIT_EVENT } from '@bemedev/app-ts/lib/events';
 import type { Ru } from '@bemedev/app-ts/lib/libs/bemedev/globals/types';
-import {
-  createMemo,
-  createSignal,
-  type Accessor,
-  type Signal,
-} from 'solid-js';
+import { createMemo, createSignal } from 'solid-js';
 import { produce } from 'solid-js/store';
 import { defaultSelector } from './default';
+import type {
+  AddOptions_F,
+  Options,
+  SendUI_F,
+  StateSignal,
+  ToSignals,
+} from './types';
 
-type ToSignals<T extends Ru> = {
-  [K in keyof T]?: Signal<T[K] | undefined>;
-};
-
-type StateSignal<M extends AnyMachine, S extends Ru> = State<
-  ContextFrom<M>,
-  EventsFrom<M>
-> & {
-  uiThread?: {
-    [K in keyof S]?: Accessor<S[K] | undefined>;
-  };
-};
-
-export type Options<
-  M extends AnyMachine,
-  S extends Ru,
-> = MachineOptionsFrom<M> & {
-  uiThread?: ToSignals<S>;
-};
-
-export class Interpreter<
-  const M extends AnyMachine,
-  const S extends Ru,
-  Si extends StateSignal<M, S> = StateSignal<M, S>,
-> {
+class Interpreter<
+    const M extends AnyMachine,
+    const S extends Ru,
+    Si extends StateSignal<M, S> = StateSignal<M, S>,
+  >
+  implements Disposable, AsyncDisposable
+{
   #machine: M;
   #uiThread?: ToSignals<S>;
   // #options?: Options<M, S>;
   #service: InterpreterFrom<M>;
   #mainState = createSignal<Si>();
+  #options?: Options<M, S>;
 
   #setState = this.#mainState[1];
   #state = () => {
@@ -65,7 +47,7 @@ export class Interpreter<
         draft.uiThread = Object.entries({ ...this.#uiThread }).reduce(
           (acc, [key, value]) => {
             if (!acc) acc = {};
-            acc[key as keyof S] = value?.[0];
+            acc[key as keyof S] = value?.[0]();
             return acc;
           },
           {} as Si['uiThread'],
@@ -76,8 +58,8 @@ export class Interpreter<
 
   constructor(
     machine: M,
-    uiThread?: S,
     private interpreterOptions?: InterpreterOptions<M>,
+    uiThread?: S,
   ) {
     this.#machine = machine;
 
@@ -110,19 +92,35 @@ export class Interpreter<
     });
   }
 
-  start = () => {
-    this.#service.start();
-  };
+  get start() {
+    return this.#service.start;
+  }
 
-  stop = () => {
-    this.#service.stop();
-  };
+  get pause() {
+    return this.#service.pause;
+  }
+
+  get resume() {
+    return this.#service.resume;
+  }
+
+  get stop() {
+    return this.#service.stop;
+  }
 
   get subscribe() {
     return this.#service.subscribe;
   }
 
   readonly #initialState: Si;
+
+  get send() {
+    return this.#service.send;
+  }
+
+  sendUI: SendUI_F<S> = event => {
+    return this.#uiThread?.[event.type]?.[1](event.payload as any);
+  };
 
   state = <T = Si>(
     accessor: (state: Si) => T = defaultSelector,
@@ -152,10 +150,6 @@ export class Interpreter<
     };
   };
 
-  get send() {
-    return this.#service.send;
-  }
-
   context = this.reducer(state => state.context);
   value = this.watcher(state => state.value);
   status = this.watcher(state => state.status);
@@ -183,9 +177,10 @@ export class Interpreter<
     return values.some(value => dps.includes(value));
   };
 
-  get addOptions() {
-    return this.#service.addOptions;
-  }
+  addOptions: AddOptions_F<M, S> = option => {
+    this.#options = this.#service.addOptions(option);
+    return this.#options;
+  };
 
   addUIoptions = (option: ToSignals<S>) => {
     this.#uiThread = {
@@ -202,7 +197,6 @@ export class Interpreter<
   ) => {
     const instance = new Interpreter<M, S>(
       this.#machine,
-      undefined,
       this.interpreterOptions,
     );
     instance.addOptions(option);
@@ -210,7 +204,37 @@ export class Interpreter<
     return instance;
   };
 
-  dispose = async () => {
-    await this.#service[Symbol.asyncDispose]();
+  dispose = () => {
+    this.#service.dispose();
+    this.#setState();
+    this.#uiThread = undefined;
+    this.interpreterOptions = undefined;
+    this.#options = undefined;
+    (this.#mainState as any) = undefined;
   };
+
+  [Symbol.dispose] = this.dispose;
+
+  [Symbol.asyncDispose] = async () => this.dispose();
 }
+
+export type { Interpreter };
+
+export type Interpreter_F = <
+  const M extends AnyMachine,
+  const S extends Ru,
+  Si extends StateSignal<M, S> = StateSignal<M, S>,
+>(
+  ...[machine, config, uiThread]: [...InterpretArgs<M>, S?]
+) => Interpreter<M, S, Si>;
+
+export const createInterpreter = <
+  const M extends AnyMachine,
+  const S extends Ru,
+  Si extends StateSignal<M, S> = StateSignal<M, S>,
+>(
+  ...[machine, config, uiThread]: [...InterpretArgs<M>, S?]
+) => {
+  const args = [machine, config, uiThread] as [any, any, any];
+  return new Interpreter<M, S, Si>(...args);
+};

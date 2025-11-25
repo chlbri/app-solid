@@ -8,8 +8,8 @@ importers:
   .:
     devDependencies:
       '@bemedev/app-ts':
-        specifier: ^1.4.3
-        version: 1.4.3(@bemedev/types@0.4.2)(vitest@3.2.4(@types/node@24.10.1)(jiti@2.6.1)(jsdom@27.2.0))
+        specifier: ^1.4.5
+        version: 1.4.5(@bemedev/types@0.4.2)(vitest@3.2.4(@types/node@24.10.1)(jiti@2.6.1)(jsdom@27.2.0))
       '@bemedev/decompose':
         specifier: 1.4.0
         version: 1.4.0(@bemedev/types@0.4.2)(vitest@3.2.4(@types/node@24.10.1)(jiti@2.6.1)(jsdom@27.2.0))
@@ -195,10 +195,10 @@ packages:
       }
     engines: { node: '>=18' }
 
-  '@bemedev/app-ts@1.4.3':
+  '@bemedev/app-ts@1.4.5':
     resolution:
       {
-        integrity: sha512-xOebbaCjhXQmWn+d5S02OG5H0yWdcONSz6LPGQs7ZbDvQQ8xtS+fgXIwTaEOYh7t2XiNZJkFHkpkH8jo4J1PMA==,
+        integrity: sha512-uHaNPgnFC9ogXEmLr+NVqpusbwPIsQjb9ADKjOxez9v1aInxIci7bg9VvuPZ+d/fdXmR6g2aa0zNyR11lZBDbQ==,
       }
     engines: { node: '>=22' }
 
@@ -3387,7 +3387,7 @@ snapshots:
 
   '@bcoe/v8-coverage@1.0.2': {}
 
-  '@bemedev/app-ts@1.4.3(@bemedev/types@0.4.2)(vitest@3.2.4(@types/node@24.10.1)(jiti@2.6.1)(jsdom@27.2.0))':
+  '@bemedev/app-ts@1.4.5(@bemedev/types@0.4.2)(vitest@3.2.4(@types/node@24.10.1)(jiti@2.6.1)(jsdom@27.2.0))':
     dependencies:
       '@bemedev/basifun': 0.5.3
       '@bemedev/boolean-recursive': 0.0.3
