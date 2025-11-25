@@ -86,7 +86,7 @@
     }
   ],
   "devDependencies": {
-    "@bemedev/app-ts": "^1.4.5",
+    "@bemedev/app-ts": "^1.4.6",
     "@bemedev/decompose": "1.4.0",
     "@bemedev/fsf": "^1.0.1",
     "@bemedev/rollup-config": "^0.2.2",
@@ -130,5 +130,8 @@
     "@bemedev/decompose": "^1.4.0",
     "@bemedev/types": "^0.4.2",
     "solid-js": "^1.9.10"
+  },
+  "dependencies": {
+    "deepmerge-ts": "^7.1.5"
   }
 }

@@ -2,36 +2,30 @@ import {
   decomposeSV,
   interpret,
   type AnyMachine,
-  type InterpretArgs,
   type InterpreterFrom,
   type InterpreterOptions,
 } from '@bemedev/app-ts';
 import { DEFAULT_DELIMITER as replacement } from '@bemedev/app-ts/lib/constants/index.js';
 import { INIT_EVENT } from '@bemedev/app-ts/lib/events';
 import type { Ru } from '@bemedev/app-ts/lib/libs/bemedev/globals/types';
+import { merge } from '@bemedev/app-ts/lib/utils';
 import { createMemo, createSignal } from 'solid-js';
-import { produce } from 'solid-js/store';
 import { defaultSelector } from './default';
 import type {
   AddOptions_F,
   Options,
   SendUI_F,
+  State_F,
   StateSignal,
-  ToSignals,
 } from './types';
 
-class Interpreter<
-    const M extends AnyMachine,
-    const S extends Ru,
-    Si extends StateSignal<M, S> = StateSignal<M, S>,
-  >
+class Interpreter<const M extends AnyMachine, const S extends Ru>
   implements Disposable, AsyncDisposable
 {
   #machine: M;
-  #uiThread?: ToSignals<S>;
   // #options?: Options<M, S>;
   #service: InterpreterFrom<M>;
-  #mainState = createSignal<Si>();
+  #mainState = createSignal<StateSignal<M, S>>();
   #options?: Options<M, S>;
 
   #setState = this.#mainState[1];
@@ -41,19 +35,18 @@ class Interpreter<
   };
 
   #addUIState = () => {
-    this.#setState(
-      produce(draft => {
-        if (!draft) draft = {} as Si;
-        draft.uiThread = Object.entries({ ...this.#uiThread }).reduce(
-          (acc, [key, value]) => {
-            if (!acc) acc = {};
-            acc[key as keyof S] = value?.[0]();
-            return acc;
-          },
-          {} as Si['uiThread'],
-        );
-      }),
-    );
+    console.warn('Adding UI State');
+    this.#setState(state => {
+      return {
+        ...state,
+        uiThread: Object.entries({
+          ...this.#options?.uiThread,
+        }).reduce((acc, [key, value]: [string, any]) => {
+          acc[key as keyof S] = value?.[0]();
+          return acc;
+        }, {} as any),
+      };
+    });
   };
 
   constructor(
@@ -64,31 +57,46 @@ class Interpreter<
     this.#machine = machine;
 
     if (uiThread) {
-      this.#uiThread = Object.entries(uiThread).reduce((acc, [key]) => {
-        acc[key as keyof S] = createSignal();
-        return acc;
-      }, {} as any);
+      if (!this.#options) this.#options = {} as any;
+      this.#options!.uiThread = Object.entries(uiThread).reduce(
+        (acc, [key]) => {
+          acc[key as keyof S] = createSignal();
+          return acc;
+        },
+        {} as any,
+      );
 
       this.#addUIState();
     }
 
     this.#service = (interpret as any)(this.#machine, interpreterOptions);
 
+    const _ui = this.#options?.uiThread;
+
     this.#initialState = {
       context: this.#service.context,
       status: 'idle',
       value: this.#service.initialValue,
       event: INIT_EVENT,
-      uiThread: this.#uiThread,
-    } as Si;
+      uiThread: _ui
+        ? Object.entries(_ui)
+            .map(
+              ([key, [signal]]: [string, any]) =>
+                [key, signal()] as [keyof S, S[keyof S]],
+            )
+            .reduce((acc, [key, value]) => {
+              if (!acc) acc = {} as any;
+              acc[key] = value;
+              return acc;
+            }, {} as any)
+        : undefined,
+    } as StateSignal<M, S>;
 
-    this.subscribe(state => {
-      this.#setState(
-        produce(draft => {
-          if (!draft) draft = {} as Si;
-          draft = { ...draft, ...state };
-        }),
-      );
+    this.subscribe(next => {
+      this.#setState(prev => ({
+        ...prev,
+        ...next,
+      }));
     });
   }
 
@@ -112,32 +120,45 @@ class Interpreter<
     return this.#service.subscribe;
   }
 
-  readonly #initialState: Si;
+  readonly #initialState: StateSignal<M, S>;
 
   get send() {
     return this.#service.send;
   }
 
   sendUI: SendUI_F<S> = event => {
-    return this.#uiThread?.[event.type]?.[1](event.payload as any);
+    const fn = this.#options?.uiThread?.[event.type]?.[1];
+    console.log('thread', !!this.#options?.uiThread);
+    console.log('fn', !!fn);
+    const out = this.#options?.uiThread?.[event.type]?.[1](
+      event.payload as any,
+    );
+    this.#addUIState();
+
+    return out;
   };
 
-  state = <T = Si>(
-    accessor: (state: Si) => T = defaultSelector,
-    equals?: (prev: T, next: T) => boolean,
+  state: State_F<StateSignal<M, S>> = (
+    accessor = defaultSelector,
+    equals,
   ) => {
-    return createMemo(() => accessor(this.#state()), {
-      equals,
-    });
+    return createMemo(
+      () => {
+        const value = this.#state();
+        return accessor(value);
+      },
+      this.#initialState,
+      { equals },
+    );
   };
 
-  watcher = <T>(accessor: (state: Si) => T) => {
+  watcher = <T>(accessor: (state: StateSignal<M, S>) => T) => {
     return (equals?: (prev: T, next: T) => boolean) => {
       return this.state(accessor, equals)();
     };
   };
 
-  reducer = <T>(accessor: (state: Si) => T) => {
+  reducer = <T>(accessor: (state: StateSignal<M, S>) => T) => {
     return <R = T>(
       _accessor: (state: T) => R = defaultSelector,
       equals?: (prev: R, next: R) => boolean,
@@ -159,12 +180,22 @@ class Interpreter<
     return tags.every(tag => currentTags.includes(tag));
   };
 
-  __isUsedUi = this.state(
-    state => !!state.uiThread && Object.keys(state.uiThread).length > 0,
-  );
+  ui = this.reducer(state => state.uiThread);
+
+  /**
+   * @deprecated
+   * Only for testing purposes
+   */
+
+  __isUsedUi = () => {
+    const state = this.#options?.uiThread;
+    return !!state && Object.keys(state).length > 0;
+  };
 
   dps = this.watcher(({ value }) =>
-    decomposeSV(value).map(entry => entry.replaceAll('.', replacement)),
+    decomposeSV
+      .low(value)
+      .map(entry => entry.replaceAll('.', replacement)),
   );
 
   matches = (...values: string[]) => {
@@ -178,36 +209,26 @@ class Interpreter<
   };
 
   addOptions: AddOptions_F<M, S> = option => {
-    this.#options = this.#service.addOptions(option);
-    return this.#options;
-  };
-
-  addUIoptions = (option: ToSignals<S>) => {
-    this.#uiThread = {
-      ...this.#uiThread,
-      ...option,
-    };
-
+    this.#options = merge(this.#options, this.#service.addOptions(option));
     this.#addUIState();
+    return this.#options;
   };
 
   provideOptions = (
     option: Parameters<InterpreterFrom<M>['addOptions']>[0],
-    uiOption: ToSignals<S>,
   ) => {
     const instance = new Interpreter<M, S>(
       this.#machine,
       this.interpreterOptions,
     );
     instance.addOptions(option);
-    instance.addUIoptions(uiOption);
+
     return instance;
   };
 
   dispose = () => {
     this.#service.dispose();
     this.#setState();
-    this.#uiThread = undefined;
     this.interpreterOptions = undefined;
     this.#options = undefined;
     (this.#mainState as any) = undefined;
@@ -223,18 +244,15 @@ export type { Interpreter };
 export type Interpreter_F = <
   const M extends AnyMachine,
   const S extends Ru,
-  Si extends StateSignal<M, S> = StateSignal<M, S>,
 >(
-  ...[machine, config, uiThread]: [...InterpretArgs<M>, S?]
-) => Interpreter<M, S, Si>;
+  ...[machine, config, uiThread]: object extends InterpreterOptions<M>
+    ? [M, InterpreterOptions<M>?, S?]
+    : [M, InterpreterOptions<M>, S?]
+) => Interpreter<M, S>;
 
-export const createInterpreter = <
-  const M extends AnyMachine,
-  const S extends Ru,
-  Si extends StateSignal<M, S> = StateSignal<M, S>,
->(
-  ...[machine, config, uiThread]: [...InterpretArgs<M>, S?]
+export const createInterpreter: Interpreter_F = (
+  ...[machine, config, uiThread]
 ) => {
   const args = [machine, config, uiThread] as [any, any, any];
-  return new Interpreter<M, S, Si>(...args);
+  return new Interpreter(...args);
 };

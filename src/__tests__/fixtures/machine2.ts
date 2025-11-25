@@ -115,11 +115,11 @@ export const machine2 = createMachine(
     context: {
       iterator: 'number',
       input: 'string',
-      data: ['string'],
+      data: typings.array('string'),
     },
     promiseesMap: {
       fetch: {
-        then: ['string'],
+        then: typings.array('string'),
         catch: 'primitive',
       },
     },
