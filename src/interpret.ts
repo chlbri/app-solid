@@ -18,7 +18,7 @@ import {
 
 import type { Decompose } from '@bemedev/decompose';
 import type { types } from '@bemedev/types';
-import { createMemo, createRoot, from, type Accessor } from 'solid-js';
+import { createMemo, from, type Accessor } from 'solid-js';
 import { defaultSelector } from './default';
 
 export const interpret = <const M extends AnyMachine>(
@@ -67,10 +67,12 @@ export const interpret = <const M extends AnyMachine>(
       equals,
     ]: GetProps<T>
   ): Accessor<T> => {
-    const out = createRoot(() =>
-      createMemo(() => accessor(store()), accessor(initialState), {
+    const out = createMemo(
+      () => accessor(store()),
+      accessor(initialState),
+      {
         equals,
-      }),
+      },
     );
 
     return out;
@@ -94,7 +96,7 @@ export const interpret = <const M extends AnyMachine>(
     return reduceS;
   };
 
-  const context = reducer((state: StateM) => state.context);
+  const context = reducer(state => state.context);
   const send = service.send;
   const value = () => state(state => state.value)();
 
@@ -122,19 +124,17 @@ export const interpret = <const M extends AnyMachine>(
 
   const _select: _Select = (selector, equals) => {
     const initial = getByKey(initialState, selector);
-    const out = createRoot(() =>
-      createMemo(
-        () => {
-          const _state = store();
-          const _out = getByKey(_state, selector);
+    const out = createMemo(
+      () => {
+        const _state = store();
+        const _out = getByKey(_state, selector);
 
-          return _out;
-        },
-        initial,
-        {
-          equals,
-        },
-      ),
+        return _out;
+      },
+      initial,
+      {
+        equals,
+      },
     );
 
     return out;

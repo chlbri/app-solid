@@ -13,13 +13,17 @@ export const machine1 = createMachine(
         },
         on: {
           NEXT: { target: '/final', description: 'Next' },
+          INIT: { actions: ['init'] },
         },
       },
       final: {},
     },
   },
   typings({
-    eventsMap: { NEXT: 'primitive' },
+    eventsMap: {
+      NEXT: 'primitive',
+      INIT: 'primitive',
+    },
     promiseesMap: {},
     pContext: 'primitive',
     context: typings.partial({

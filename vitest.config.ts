@@ -2,6 +2,7 @@ import { aliasTs } from '@bemedev/vitest-alias';
 import { exclude } from '@bemedev/vitest-exclude';
 import { defineConfig } from 'vitest/config';
 import tsconfig from './tsconfig.json';
+import solidPlugin from 'vite-plugin-solid';
 
 export default defineConfig({
   plugins: [
@@ -14,6 +15,7 @@ export default defineConfig({
         '**/fixtures/**/*.ts',
       ],
     }),
+    solidPlugin(),
   ],
   test: {
     bail: 10,

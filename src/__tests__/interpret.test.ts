@@ -29,6 +29,7 @@ describe('TESTS', () => {
       value: _value,
       status: _status,
       dispose,
+      state,
     } = interpret(machine1);
 
     let iterator = 0;
@@ -38,6 +39,11 @@ describe('TESTS', () => {
     // #region Use FakeTimers
     beforeAll(() => vi.useFakeTimers());
     // #endregion
+
+    afterEach(() => {
+      const { result } = renderHook(state(c => c.context));
+      console.warn('>>> TEST: iterator', result);
+    });
 
     beforeEach(() => {
       const { result } = renderHook(context(c => c.iterator));

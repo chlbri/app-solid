@@ -1,2 +1,2 @@
 export * from './interpret';
-export * from './types';
+export * from './interpreter.types';

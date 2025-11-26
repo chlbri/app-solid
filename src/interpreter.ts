@@ -1,15 +1,20 @@
 import {
+  interpret as _interpret,
   decomposeSV,
-  interpret,
   type AnyMachine,
   type InterpreterFrom,
   type InterpreterOptions,
+  type WorkingStatus,
 } from '@bemedev/app-ts';
 import { DEFAULT_DELIMITER as replacement } from '@bemedev/app-ts/lib/constants/index.js';
 import { INIT_EVENT } from '@bemedev/app-ts/lib/events';
-import type { Ru } from '@bemedev/app-ts/lib/libs/bemedev/globals/types';
+import type {
+  Ru,
+  SoA,
+} from '@bemedev/app-ts/lib/libs/bemedev/globals/types';
+import type { StateValue } from '@bemedev/app-ts/lib/states';
 import { merge } from '@bemedev/app-ts/lib/utils';
-import { createMemo, createSignal } from 'solid-js';
+import { createMemo, createSignal, untrack } from 'solid-js';
 import { defaultSelector } from './default';
 import type {
   AddOptions_F,
@@ -17,22 +22,27 @@ import type {
   SendUI_F,
   State_F,
   StateSignal,
-} from './types';
+} from './interpreter.types';
 
 class Interpreter<const M extends AnyMachine, const S extends Ru>
   implements Disposable, AsyncDisposable
 {
+  #status: WorkingStatus = 'idle';
   #machine: M;
-  // #options?: Options<M, S>;
   #service: InterpreterFrom<M>;
   #mainState = createSignal<StateSignal<M, S>>();
   #options?: Options<M, S>;
+  private interpreterOptions?: InterpreterOptions<M>;
 
   #setState = this.#mainState[1];
   #state = () => {
     const [getState] = this.#mainState;
     return getState() ?? this.#initialState;
   };
+
+  get #canPerform() {
+    return this.#status === 'started' || this.#status === 'working';
+  }
 
   #addUIState = () => {
     console.warn('Adding UI State');
@@ -49,18 +59,23 @@ class Interpreter<const M extends AnyMachine, const S extends Ru>
     });
   };
 
-  constructor(
-    machine: M,
-    private interpreterOptions?: InterpreterOptions<M>,
-    uiThread?: S,
-  ) {
+  constructor({
+    machine,
+    options: interpreterOptions,
+    uiThread,
+  }: {
+    machine: M;
+    options?: InterpreterOptions<M>;
+    uiThread?: S;
+  }) {
     this.#machine = machine;
+    this.interpreterOptions = interpreterOptions;
 
     if (uiThread) {
       if (!this.#options) this.#options = {} as any;
       this.#options!.uiThread = Object.entries(uiThread).reduce(
-        (acc, [key]) => {
-          acc[key as keyof S] = createSignal();
+        (acc, [key, value]) => {
+          acc[key as keyof S] = createSignal(value);
           return acc;
         },
         {} as any,
@@ -69,7 +84,10 @@ class Interpreter<const M extends AnyMachine, const S extends Ru>
       this.#addUIState();
     }
 
-    this.#service = (interpret as any)(this.#machine, interpreterOptions);
+    this.#service = (_interpret as any)(
+      this.#machine,
+      this.interpreterOptions,
+    );
 
     const _ui = this.#options?.uiThread;
 
@@ -93,14 +111,12 @@ class Interpreter<const M extends AnyMachine, const S extends Ru>
     } as StateSignal<M, S>;
 
     this.subscribe(next => {
-      this.#setState(prev => ({
-        ...prev,
-        ...next,
-      }));
+      this.#setState(prev => merge(prev, next));
     });
   }
 
   get start() {
+    this.#status = 'started';
     return this.#service.start;
   }
 
@@ -112,9 +128,11 @@ class Interpreter<const M extends AnyMachine, const S extends Ru>
     return this.#service.resume;
   }
 
-  get stop() {
-    return this.#service.stop;
-  }
+  stop = () => {
+    this.#status = 'stopped';
+    this.#service.stop();
+    untrack(this.#mainState[0]);
+  };
 
   get subscribe() {
     return this.#service.subscribe;
@@ -127,12 +145,10 @@ class Interpreter<const M extends AnyMachine, const S extends Ru>
   }
 
   sendUI: SendUI_F<S> = event => {
+    if (!this.#canPerform) return;
     const fn = this.#options?.uiThread?.[event.type]?.[1];
-    console.log('thread', !!this.#options?.uiThread);
-    console.log('fn', !!fn);
-    const out = this.#options?.uiThread?.[event.type]?.[1](
-      event.payload as any,
-    );
+
+    const out = fn(event.payload as any);
     this.#addUIState();
 
     return out;
@@ -153,15 +169,15 @@ class Interpreter<const M extends AnyMachine, const S extends Ru>
   };
 
   watcher = <T>(accessor: (state: StateSignal<M, S>) => T) => {
-    return (equals?: (prev: T, next: T) => boolean) => {
-      return this.state(accessor, equals)();
+    return (equals?: false | ((prev: T, next: T) => boolean)) => {
+      return this.state(accessor, equals);
     };
   };
 
   reducer = <T>(accessor: (state: StateSignal<M, S>) => T) => {
     return <R = T>(
       _accessor: (state: T) => R = defaultSelector,
-      equals?: (prev: R, next: R) => boolean,
+      equals?: false | ((prev: R, next: R) => boolean),
     ) => {
       return this.state(state => {
         const step1 = accessor(state);
@@ -171,22 +187,22 @@ class Interpreter<const M extends AnyMachine, const S extends Ru>
     };
   };
 
-  context = this.reducer(state => state.context);
-  value = this.watcher(state => state.value);
-  status = this.watcher(state => state.status);
+  context = this.reducer<M['context']>(state => state.context);
+  value = this.watcher<StateValue>(state => state.value);
+  status = this.watcher<WorkingStatus>(state => state.status);
+  tags = this.watcher<SoA<string>>(state => state.tags);
+  ui = this.reducer<Partial<S> | undefined>(state => state.uiThread);
+
   hasTags = (...tags: string[]) => {
     const currentTags = this.state(({ tags }) => tags)();
     if (!currentTags) return false;
     return tags.every(tag => currentTags.includes(tag));
   };
 
-  ui = this.reducer(state => state.uiThread);
-
   /**
    * @deprecated
    * Only for testing purposes
    */
-
   __isUsedUi = () => {
     const state = this.#options?.uiThread;
     return !!state && Object.keys(state).length > 0;
@@ -199,12 +215,12 @@ class Interpreter<const M extends AnyMachine, const S extends Ru>
   );
 
   matches = (...values: string[]) => {
-    const dps = this.dps();
+    const dps = this.dps()();
     return values.every(value => dps.includes(value));
   };
 
   contains = (...values: string[]) => {
-    const dps = this.dps();
+    const dps = this.dps()();
     return values.some(value => dps.includes(value));
   };
 
@@ -217,21 +233,21 @@ class Interpreter<const M extends AnyMachine, const S extends Ru>
   provideOptions = (
     option: Parameters<InterpreterFrom<M>['addOptions']>[0],
   ) => {
-    const instance = new Interpreter<M, S>(
-      this.#machine,
-      this.interpreterOptions,
-    );
+    const instance = new Interpreter<M, S>({
+      machine: this.#machine,
+      options: this.interpreterOptions,
+    });
     instance.addOptions(option);
 
     return instance;
   };
 
   dispose = () => {
+    this.stop();
     this.#service.dispose();
-    this.#setState();
-    this.interpreterOptions = undefined;
     this.#options = undefined;
     (this.#mainState as any) = undefined;
+    this.interpreterOptions = undefined;
   };
 
   [Symbol.dispose] = this.dispose;
@@ -241,18 +257,22 @@ class Interpreter<const M extends AnyMachine, const S extends Ru>
 
 export type { Interpreter };
 
+export type InterpreterArgs<M extends AnyMachine, S extends Ru> = {
+  machine: M;
+  uiThread?: S;
+} & (object extends InterpreterOptions<M>
+  ? { options?: InterpreterOptions<M> }
+  : { options: InterpreterOptions<M> });
+
 export type Interpreter_F = <
   const M extends AnyMachine,
   const S extends Ru,
 >(
-  ...[machine, config, uiThread]: object extends InterpreterOptions<M>
-    ? [M, InterpreterOptions<M>?, S?]
-    : [M, InterpreterOptions<M>, S?]
+  args: InterpreterArgs<M, S>,
 ) => Interpreter<M, S>;
 
-export const createInterpreter: Interpreter_F = (
-  ...[machine, config, uiThread]
-) => {
-  const args = [machine, config, uiThread] as [any, any, any];
-  return new Interpreter(...args);
+export const createInterpreter: Interpreter_F = args => {
+  return new Interpreter(args as any);
 };
+
+export const interpret = createInterpreter;

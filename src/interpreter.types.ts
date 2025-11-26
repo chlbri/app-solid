@@ -32,9 +32,7 @@ export type StateSignal<
   (Ru extends S
     ? unknown
     : {
-        uiThread?: {
-          [K in keyof S]?: S[K];
-        };
+        uiThread?: Partial<S>;
       });
 
 export type AddOptions_F<M extends AnyMachine, S extends Ru> = (
@@ -47,5 +45,5 @@ export type SendUI_F<S extends Ru> = <T extends ToSetters<S>>(
 
 export type State_F<T> = <const U = T>(
   accessor?: (state: T) => U,
-  equals?: (prev: U, next: U) => boolean,
+  equals?: false | ((prev: U, next: U) => boolean),
 ) => Accessor<U>;
