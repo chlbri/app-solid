@@ -4,6 +4,7 @@ import type { StateValue } from '@bemedev/app-ts/lib/states';
 import { renderHook } from '@solidjs/testing-library';
 import type { Interpreter } from '../interpreter';
 import { createInterpreter } from '../interpreter';
+import type { StateSignal } from '../interpreter.types';
 import { DELAY, machine2 } from './fixtures';
 
 vi.useFakeTimers();
@@ -169,13 +170,9 @@ class TestInterpreter<const M extends AnyMachine, const S extends Ru> {
   /**
    * Get a custom state slice using renderHook
    */
-  getState<T>(
-    accessor: (
-      state: ReturnType<ReturnType<Interpreter<M, S>['state']>>,
-    ) => T,
-  ): T {
+  getState<T>(accessor: (state: StateSignal<M, S>) => T): T {
     const { result } = renderHook(() => {
-      const stateAccessor = this.interpreter.state(accessor as any);
+      const stateAccessor = this.interpreter.state(accessor);
       return stateAccessor();
     });
     return result as T;
