@@ -18,17 +18,26 @@ describe('TESTS', () => {
     const { result: iterator } = renderHook(() =>
       inter.context(c => c.iterator),
     );
+    const { result: iteratorS } = renderHook(() =>
+      inter.context(
+        c => c.iterator,
+        () => true,
+      ),
+    );
 
     const { result: value } = renderHook(() => inter.value());
 
     inter.start();
     console.log('Initial status (direct):', value());
     console.log('Initial iterator (direct):', iterator());
+    console.log('Initial iteratorS (direct):', iteratorS());
     await vi.advanceTimersByTimeAsync(DELAY * 10);
     console.log('Status after delays (direct):', value());
     console.log('Iterator after delays (direct):', iterator());
+    console.log('IteratorS after delays (direct):', iteratorS());
     inter.send('NEXT');
     console.log('Status after NEXT (direct):', value());
     console.log('Iterator after NEXT (direct):', iterator());
+    console.log('IteratorS after NEXT (direct):', iteratorS());
   });
 });

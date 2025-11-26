@@ -3,8 +3,10 @@ import type {
   InterpreterFrom,
   MachineOptionsFrom,
   StateFrom,
+  WorkingStatus,
 } from '@bemedev/app-ts';
 import type { Ru } from '@bemedev/app-ts/lib/libs/bemedev/globals/types.js';
+import type { StateValue } from '@bemedev/app-ts/lib/states';
 import type { Accessor, Setter, Signal } from 'solid-js';
 
 export type ToSignals<T extends Ru> = {
@@ -24,6 +26,15 @@ export type Options<M extends AnyMachine, S extends Ru> =
     : MachineOptionsFrom<M> & {
         uiThread?: ToSignals<S>;
       };
+
+export type _StateSignal = {
+  uiThread: any;
+  context: any;
+  value: StateValue;
+  tags: any;
+  status: WorkingStatus;
+  event: any;
+};
 
 export type StateSignal<
   M extends AnyMachine,

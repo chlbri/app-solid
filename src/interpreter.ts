@@ -216,12 +216,12 @@ class Interpreter<const M extends AnyMachine, const S extends Ru>
 
   matches = (...values: string[]) => {
     const dps = this.dps()();
-    return values.every(value => dps.includes(value));
+    return createMemo(() => values.every(value => dps.includes(value)));
   };
 
   contains = (...values: string[]) => {
     const dps = this.dps()();
-    return values.some(value => dps.includes(value));
+    return createMemo(() => values.some(value => dps.includes(value)));
   };
 
   addOptions: AddOptions_F<M, S> = option => {
