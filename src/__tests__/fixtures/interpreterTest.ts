@@ -64,10 +64,9 @@ class InterpreterTest<
         value: this.#value,
         status: this.#status,
         tags: this.#tags,
-        matches: this.#matches,
-        contains: this.#contains,
         dps: this.#dps,
       });
+
       return this.#buildTest({ invite, expected, actual });
     };
   };
@@ -148,15 +147,40 @@ class InterpreterTest<
     return createRoot(() => this._service.dps(equals), this.#owner);
   };
 
-  #matches = (...values: string[]) => {
-    return createRoot(() => this._service.matches(...values), this.#owner);
+  matches = (...values: string[]) => {
+    return tuple(
+      this.#buildInvite(
+        `The current "value" matches : (${values.join(', ')})`,
+      ),
+      () => {
+        const actual = createRoot(
+          () => this._service.matches(...values),
+          this.#owner,
+        );
+
+        const _actual = runWithOwner(this.#owner, actual);
+
+        expect(_actual).toBe(true);
+      },
+    );
   };
 
-  #contains = (...values: string[]) => {
-    return createRoot(
-      () => this._service.contains,
-      this.#owner,
-    )(...values);
+  contains = (...values: string[]) => {
+    return tuple(
+      this.#buildInvite(
+        `The current "value" matches : (${values.join(', ')})`,
+      ),
+      () => {
+        const actual = createRoot(
+          () => this._service.contains(...values),
+          this.#owner,
+        );
+
+        const _actual = runWithOwner(this.#owner, actual);
+
+        expect(_actual).toBe(true);
+      },
+    );
   };
 
   #ui = <T = Partial<S> | undefined>(
@@ -202,8 +226,11 @@ class InterpreterTest<
   }
 
   send = (event: Parameters<typeof this._service.send>[0]) => {
-    return tuple(this.#buildInvite('Send an event'), () =>
-      this._service.send(event),
+    return tuple(
+      this.#buildInvite(
+        `Send an event : "${(event as any).type ?? event}" event`,
+      ),
+      () => this._service.send(event),
     );
   };
 

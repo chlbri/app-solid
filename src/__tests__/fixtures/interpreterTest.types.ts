@@ -41,8 +41,5 @@ export type TestBy_F<M extends AnyMachine, S extends Ru> = <
     dps: (
       equals?: false | ((prev: SoA<string>, next: SoA<string>) => boolean),
     ) => Accessor<SoA<string>>;
-
-    matches: (...values: string[]) => Accessor<boolean>;
-    contains: (...values: string[]) => Accessor<boolean>;
   }) => Accessor<T>,
 ) => (invite: string, expected: T) => [string, () => void];
