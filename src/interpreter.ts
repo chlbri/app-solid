@@ -13,7 +13,7 @@ import type {
   SoA,
 } from '@bemedev/app-ts/lib/libs/bemedev/globals/types';
 import type { StateValue } from '@bemedev/app-ts/lib/states';
-import { merge } from '@bemedev/app-ts/lib/utils';
+import { merge } from '@bemedev/app-ts/lib/utils/merge.js';
 import { createMemo, createSignal, untrack, type Signal } from 'solid-js';
 import { defaultSelector } from './default';
 import type {
@@ -50,9 +50,9 @@ class Interpreter<const M extends AnyMachine, S extends Ru>
     return {} as StateSignal<M, S>;
   }
 
-  #addUIState = () => {
+  #setUI = () => {
     this.#setState(state => {
-      return {
+      const out = {
         ...this.#initialState,
         ...state,
         uiThread: Object.entries({
@@ -62,6 +62,8 @@ class Interpreter<const M extends AnyMachine, S extends Ru>
           return acc;
         }, {} as any),
       };
+
+      return out;
     });
   };
 
@@ -83,7 +85,7 @@ class Interpreter<const M extends AnyMachine, S extends Ru>
     );
 
     this.subscribe(next => {
-      this.#setState(next);
+      this.#setState(prev => merge(prev, next));
     });
 
     this.subscribe(({ tags }) => {
@@ -124,7 +126,7 @@ class Interpreter<const M extends AnyMachine, S extends Ru>
     } as StateSignal<M, S>;
 
     this.#mainState = createSignal(this.#initialState);
-    this.#addUIState();
+    this.#setUI();
   }
 
   get start() {
@@ -161,7 +163,7 @@ class Interpreter<const M extends AnyMachine, S extends Ru>
     const fn = this.#options?.uiThread?.[event.type]?.[1];
 
     const out = fn(event.payload as any);
-    this.#addUIState();
+    this.#setUI();
 
     return out;
   };
@@ -207,7 +209,6 @@ class Interpreter<const M extends AnyMachine, S extends Ru>
 
   hasTags = (...tags: string[]) => {
     const currentTags = this.state(({ tags }) => tags)();
-    console.warn('currentTags', currentTags);
     if (!currentTags) return false;
     return tags.every(tag => currentTags.includes(tag));
   };
@@ -239,7 +240,7 @@ class Interpreter<const M extends AnyMachine, S extends Ru>
 
   addOptions: AddOptions_F<M, S> = option => {
     this.#options = merge(this.#options, this.#service.addOptions(option));
-    this.#addUIState();
+    this.#setUI();
     return this.#options;
   };
 
@@ -288,10 +289,7 @@ export type InterpreterArgs<M extends AnyMachine, S extends Ru> = {
   ? { options?: InterpreterOptions<M> }
   : { options: InterpreterOptions<M> });
 
-export type Interpreter_F = <
-  const M extends AnyMachine,
-  const S extends Ru,
->(
+export type Interpreter_F = <const M extends AnyMachine, S extends Ru>(
   args: InterpreterArgs<M, S>,
 ) => Interpreter<M, S>;
 

@@ -1,8 +1,8 @@
 import { createInterpreter } from '../interpreter';
-import { DELAY, fakeDB, machine2 } from './fixtures';
-import { createTests } from './fixtures/interpreterTest';
+import { createTests, DELAY, fakeDB, machine2, muteLog } from './fixtures';
 
 vi.useFakeTimers();
+muteLog();
 
 describe('machine2', async () => {
   const inter = createTests(
@@ -78,7 +78,6 @@ describe('machine2', async () => {
   it(...iterator('iterator', 110));
   it(...inter.pause);
   it(...wait(50));
-  it(...inter.send('NEXT'));
 
   it(
     ...testValue('State remains the same', {
@@ -156,6 +155,8 @@ describe('machine2', async () => {
   it(...testInput('Empty', INPUT));
   it(...wait(60));
   it(...iterator('iterator', 490));
+  it(...wait(6));
+  it(...iterator('iterator', 502));
   it(...inter.send('FETCH'));
   it(...iteratorNoChanges('iteratorNoChanges', 0));
 
@@ -166,6 +167,39 @@ describe('machine2', async () => {
   );
 
   it(...testData('Data is full', FAKES));
+
+  it(...wait(4));
+  it(...iterator('iterator', 510));
+  it(...wait());
+  it(...iterator('iterator', 510));
+  it(...wait());
+  it(...iterator('iterator', 514));
+  it(...wait(8));
+  it(...iterator('iterator', 530));
+  it(...inter.send('NEXT'));
+  it(...testValue('Value returns to "idle"', 'idle'));
+
+  it(
+    ...inter.addOptions(({ assign }) => ({
+      actions: {
+        inc2: assign(
+          'context.iterator',
+          ({ context: { iterator } }) => iterator + 10,
+        ),
+      },
+    })),
+  );
+
+  it(...inter.send('NEXT'));
+
+  it(
+    ...testValue('After NEXT, value is inside "working"', {
+      working: { fetch: 'idle', ui: 'idle' },
+    }),
+  );
+
+  it(...wait(14));
+  it(...iterator('iterator', 600));
   it(...inter.stop);
   it(...inter.dispose);
 });

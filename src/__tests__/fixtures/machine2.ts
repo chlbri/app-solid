@@ -29,6 +29,7 @@ export const config2 = createConfig({
       },
       on: {
         FINISH: '/final',
+        NEXT: '/idle',
       },
       states: {
         fetch: {

@@ -287,19 +287,25 @@ class InterpreterTest<const M extends AnyMachine, S extends Ru> {
     );
   };
 
-  get addOptions() {
-    return this._service.addOptions;
-  }
+  addOptions = (
+    option: Parameters<typeof this._service.addOptions>[0],
+  ) => {
+    return tuple(this.#buildInvite('Add options'), () =>
+      this._service.addOptions(option),
+    );
+  };
 
-  get provideOptions() {
-    return this._service.provideOptions;
-  }
+  provideOptions = (
+    option: Parameters<typeof this._service.provideOptions>[0],
+  ) => {
+    return tuple(this.#buildInvite('Provide options'), () =>
+      this._service.provideOptions(option),
+    );
+  };
 
   sendUI = (event: Parameters<typeof this._service.sendUI>[0]) => {
     return tuple(
-      this.#buildInvite(
-        `Send an UI event : "${(event as any).type ?? event}" event`,
-      ),
+      this.#buildInvite(`Send an UI event : "${event.type}" event`),
       () => this._service.sendUI(event),
     );
   };

@@ -5,3 +5,4 @@ export * from './machine2';
 export * from './interpreterTest';
 export * from './machine3';
 export * from './MainComponent';
+export * from './log';
