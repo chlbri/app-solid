@@ -1,4 +1,4 @@
-import type { AnyMachine } from '@bemedev/app-ts';
+import type { AnyMachine, WorkingStatus } from '@bemedev/app-ts';
 import type {
   Ru,
   SoA,
@@ -14,8 +14,7 @@ import { expect, type VitestUtils } from 'vitest';
 import { defaultSelector } from '../../default';
 import type { Interpreter } from '../../interpreter';
 import type { State_F, StateSignal } from '../../interpreter.types';
-import { tuple } from '../interpret.fixtures';
-import type { TestBy_F } from './interpreterTest.types';
+import { tuple } from './tuple';
 
 type TestFn = <T>(args: {
   invite: string;
@@ -23,10 +22,7 @@ type TestFn = <T>(args: {
   actual: Accessor<T>;
 }) => [string, () => void];
 
-class InterpreterTest<
-  const M extends AnyMachine = AnyMachine,
-  const S extends Ru = Ru,
-> {
+class InterpreterTest<const M extends AnyMachine, S extends Ru> {
   constructor(
     private vi: VitestUtils,
     private _service: Interpreter<M, S>,
@@ -53,10 +49,65 @@ class InterpreterTest<
     });
   };
 
+  get __service() {
+    return {} as typeof this._service;
+  }
+
   #owner = getOwner();
 
-  testBy: TestBy_F<M, S> = fn => {
-    return (invite, expected) => {
+  testBy = <T>(
+    fn: (args: {
+      state: <
+        T = {
+          context: M['context'];
+          value: StateValue;
+          tags?: SoA<string>;
+          event: M['__events'];
+          status: WorkingStatus;
+          uiThread?: Partial<S>;
+        },
+      >(
+        accessor?: (ctx: {
+          context: M['context'];
+          value: StateValue;
+          tags?: SoA<string>;
+          event: M['__events'];
+          status: WorkingStatus;
+          uiThread?: Partial<S>;
+        }) => T,
+        equals?: false | ((prev: T, next: T) => boolean) | undefined,
+      ) => Accessor<T>;
+      context: <T = M['context']>(
+        accessor?: (ctx: M['context']) => T,
+        equals?: false | ((prev: T, next: T) => boolean) | undefined,
+      ) => Accessor<T>;
+      ui: <T = Partial<S> | undefined>(
+        _accessor?: (ui: Partial<S> | undefined) => T,
+        equals?: false | ((prev: T, next: T) => boolean),
+      ) => Accessor<T>;
+      value: (
+        equals?:
+          | false
+          | ((prev: StateValue, next: StateValue) => boolean)
+          | undefined,
+      ) => Accessor<StateValue>;
+      status: (
+        equals?:
+          | false
+          | ((prev: WorkingStatus, next: WorkingStatus) => boolean)
+          | undefined,
+      ) => Accessor<WorkingStatus>;
+      tags: (
+        equals?:
+          | false
+          | ((prev: SoA<string>, next: SoA<string>) => boolean),
+      ) => Accessor<SoA<string>>;
+      dps: (
+        equals?: false | ((prev: string[], next: string[]) => boolean),
+      ) => Accessor<string[]>;
+    }) => Accessor<T>,
+  ) => {
+    return (invite: string, expected: T) => {
       const actual = fn({
         state: this.#state,
         context: this.#context,
@@ -114,7 +165,7 @@ class InterpreterTest<
   };
 
   #context = <T = M['context']>(
-    accessor: (ctx: M['context']) => T,
+    accessor: (ctx: M['context']) => T = defaultSelector,
     equals?: false | ((prev: T, next: T) => boolean),
   ) => {
     return createRoot(
@@ -130,7 +181,9 @@ class InterpreterTest<
   };
 
   #status = (
-    equals?: false | ((prev: string, next: string) => boolean),
+    equals?:
+      | false
+      | ((prev: WorkingStatus, next: WorkingStatus) => boolean),
   ) => {
     return createRoot(() => this._service.status(equals), this.#owner);
   };
@@ -142,7 +195,7 @@ class InterpreterTest<
   };
 
   #dps = (
-    equals?: false | ((prev: SoA<string>, next: SoA<string>) => boolean),
+    equals?: false | ((prev: string[], next: string[]) => boolean),
   ) => {
     return createRoot(() => this._service.dps(equals), this.#owner);
   };
@@ -231,6 +284,35 @@ class InterpreterTest<
         `Send an event : "${(event as any).type ?? event}" event`,
       ),
       () => this._service.send(event),
+    );
+  };
+
+  get addOptions() {
+    return this._service.addOptions;
+  }
+
+  get provideOptions() {
+    return this._service.provideOptions;
+  }
+
+  sendUI = (event: Parameters<typeof this._service.sendUI>[0]) => {
+    return tuple(
+      this.#buildInvite(
+        `Send an UI event : "${(event as any).type ?? event}" event`,
+      ),
+      () => this._service.sendUI(event),
+    );
+  };
+
+  hasTags = (...tags: string[]) => {
+    return tuple(
+      this.#buildInvite(`Check hasTags : (${tags.join(', ')})`),
+      () => {
+        const actual = runWithOwner(this.#owner, () =>
+          createRoot(() => this._service.hasTags(...tags), this.#owner),
+        );
+        expect(actual).toBe(true);
+      },
     );
   };
 

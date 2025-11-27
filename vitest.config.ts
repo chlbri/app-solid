@@ -12,6 +12,7 @@ export default defineConfig({
         '**/index.ts',
         'src/types.ts',
         '**/*.fixtures.ts',
+        '**/*.types.ts',
         '**/fixtures/**/*.ts',
       ],
     }),

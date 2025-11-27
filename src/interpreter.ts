@@ -14,7 +14,7 @@ import type {
 } from '@bemedev/app-ts/lib/libs/bemedev/globals/types';
 import type { StateValue } from '@bemedev/app-ts/lib/states';
 import { merge } from '@bemedev/app-ts/lib/utils';
-import { createMemo, createSignal, untrack } from 'solid-js';
+import { createMemo, createSignal, untrack, type Signal } from 'solid-js';
 import { defaultSelector } from './default';
 import type {
   AddOptions_F,
@@ -23,31 +23,37 @@ import type {
   State_F,
   StateSignal,
 } from './interpreter.types';
+import { asyncify } from './helpers';
 
-class Interpreter<const M extends AnyMachine, const S extends Ru>
+class Interpreter<const M extends AnyMachine, S extends Ru>
   implements Disposable, AsyncDisposable
 {
   #status: WorkingStatus = 'idle';
   #machine: M;
   #service: InterpreterFrom<M>;
-  #mainState = createSignal<StateSignal<M, S>>();
+  #mainState: Signal<StateSignal<M, S>>;
   #options?: Options<M, S>;
   private interpreterOptions?: InterpreterOptions<M>;
 
-  #setState = this.#mainState[1];
-  #state = () => {
-    const [getState] = this.#mainState;
-    return getState() ?? this.#initialState;
-  };
+  get #setState() {
+    return this.#mainState[1];
+  }
+  get #state() {
+    return this.#mainState[0];
+  }
 
   get #canPerform() {
     return this.#status === 'started' || this.#status === 'working';
   }
 
+  get __stateSignal() {
+    return {} as StateSignal<M, S>;
+  }
+
   #addUIState = () => {
-    console.warn('Adding UI State');
     this.#setState(state => {
       return {
+        ...this.#initialState,
         ...state,
         uiThread: Object.entries({
           ...this.#options?.uiThread,
@@ -71,6 +77,20 @@ class Interpreter<const M extends AnyMachine, const S extends Ru>
     this.#machine = machine;
     this.interpreterOptions = interpreterOptions;
 
+    this.#service = (_interpret as any)(
+      this.#machine,
+      this.interpreterOptions,
+    );
+
+    this.subscribe(next => {
+      this.#setState(next);
+    });
+
+    this.subscribe(({ tags }) => {
+      console.log('TAGS', tags);
+      console.log('TAGS --- ', this.#service.config.tags);
+    });
+
     if (uiThread) {
       if (!this.#options) this.#options = {} as any;
       this.#options!.uiThread = Object.entries(uiThread).reduce(
@@ -80,14 +100,7 @@ class Interpreter<const M extends AnyMachine, const S extends Ru>
         },
         {} as any,
       );
-
-      this.#addUIState();
     }
-
-    this.#service = (_interpret as any)(
-      this.#machine,
-      this.interpreterOptions,
-    );
 
     const _ui = this.#options?.uiThread;
 
@@ -110,9 +123,8 @@ class Interpreter<const M extends AnyMachine, const S extends Ru>
         : undefined,
     } as StateSignal<M, S>;
 
-    this.subscribe(next => {
-      this.#setState(prev => merge(prev, next));
-    });
+    this.#mainState = createSignal(this.#initialState);
+    this.#addUIState();
   }
 
   get start() {
@@ -190,11 +202,12 @@ class Interpreter<const M extends AnyMachine, const S extends Ru>
   context = this.reducer<M['context']>(state => state.context);
   value = this.watcher<StateValue>(state => state.value);
   status = this.watcher<WorkingStatus>(state => state.status);
-  tags = this.watcher<SoA<string>>(state => state.tags);
+  tags = this.watcher<SoA<string>>(state => state.tags ?? []);
   ui = this.reducer<Partial<S> | undefined>(state => state.uiThread);
 
   hasTags = (...tags: string[]) => {
     const currentTags = this.state(({ tags }) => tags)();
+    console.warn('currentTags', currentTags);
     if (!currentTags) return false;
     return tags.every(tag => currentTags.includes(tag));
   };
@@ -203,10 +216,10 @@ class Interpreter<const M extends AnyMachine, const S extends Ru>
    * @deprecated
    * Only for testing purposes
    */
-  __isUsedUi = () => {
+  get __isUsedUi() {
     const state = this.#options?.uiThread;
     return !!state && Object.keys(state).length > 0;
-  };
+  }
 
   dps = this.watcher(({ value }) =>
     decomposeSV
@@ -251,9 +264,20 @@ class Interpreter<const M extends AnyMachine, const S extends Ru>
   };
 
   [Symbol.dispose] = this.dispose;
-
-  [Symbol.asyncDispose] = async () => this.dispose();
+  [Symbol.asyncDispose] = asyncify(this.dispose);
 }
+
+export type AnyInterpreter = Record<
+  | '__stateSignal'
+  | 'state'
+  | 'context'
+  | 'ui'
+  | 'value'
+  | 'status'
+  | 'tags'
+  | 'dps',
+  any
+>;
 
 export type { Interpreter };
 
