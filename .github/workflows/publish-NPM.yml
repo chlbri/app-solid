@@ -116,7 +116,7 @@ jobs:
         run: pnpm install --no-frozen-lockfile && pnpm run build
 
       - name: Install test package dependencies
-        run: cd packages/test && pnpm install --no-frozen-lockfile
+        run: cd packages/test && pnpm install
 
       - name: Build test package
         run: cd packages/test && pnpm run build
