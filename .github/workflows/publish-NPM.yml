@@ -112,8 +112,11 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-pnpm-store-
 
+      - name: Build upper deps
+        run: pnpm run build
+
       - name: Install test package dependencies
-        run: cd packages/test && pnpm install
+        run: cd packages/test && pnpm install --no-frozen-lockfile
 
       - name: Build test package
         run: cd packages/test && pnpm run build
