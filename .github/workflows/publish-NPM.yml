@@ -113,7 +113,7 @@ jobs:
             ${{ runner.os }}-pnpm-store-
 
       - name: Build upper deps
-        run: pnpm run build
+        run: pnpm install --no-frozen-lockfile && pnpm run build
 
       - name: Install test package dependencies
         run: cd packages/test && pnpm install --no-frozen-lockfile
