@@ -35,6 +35,8 @@ jobs:
   test-package:
     name: Test Package
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
 
     steps:
       - name: Checkout pnpm repo
