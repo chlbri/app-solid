@@ -1,0 +1,92 @@
+{
+  "name": "@bemedev/app-solid-test",
+  "version": "0.1.0",
+  "description": "Test utilities for @bemedev/app-solid",
+  "author": {
+    "email": "bri_lvi@icloud.com",
+    "name": "chlbri",
+    "url": "https://bemedev.vercel.app"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/chlbri/app-solid"
+  },
+  "license": "MIT",
+  "type": "module",
+  "main": "lib/index.js",
+  "types": "lib/index.d.ts",
+  "module": "lib/index.js",
+  "maintainers": [
+    {
+      "email": "bri_lvi@icloud.com",
+      "name": "chlbri",
+      "url": "https://bemedev.vercel.app"
+    }
+  ],
+  "contributors": [
+    {
+      "email": "bri_lvi@icloud.com",
+      "name": "chlbri",
+      "url": "https://bemedev.vercel.app"
+    }
+  ],
+  "keywords": [
+    "app",
+    "state-machines",
+    "solidjs",
+    "bemedev",
+    "test",
+    "vitest"
+  ],
+  "files": [
+    "lib"
+  ],
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "build": "pnpm rm:lib && pnpm run rollup",
+    "eslint": "eslint \"src/**/*.{ts,tsx}\"",
+    "lint": "pnpm run prettier && pnpm run eslint --fix",
+    "prettier": "prettier --write \"src/**/*.{ts,tsx}\"",
+    "rimraf": "pnpx rimraf -rf",
+    "rm:lib": "pnpm run rimraf -- lib",
+    "rollup": "rollup -c",
+    "test": "vitest run"
+  },
+  "devDependencies": {
+    "@bemedev/app-cli": "^0.1.7",
+    "@bemedev/app-ts": "^1.6.0",
+    "@bemedev/decompose": "1.4.0",
+    "@bemedev/rollup-config": "^0.2.2",
+    "@bemedev/types": "^0.4.2",
+    "@bemedev/vitest-alias": "^0.0.3",
+    "@bemedev/vitest-exclude": "^0.1.1",
+    "@eslint/eslintrc": "^3.3.3",
+    "@eslint/js": "^9.39.1",
+    "@solidjs/testing-library": "^0.8.10",
+    "@testing-library/jest-dom": "^6.9.1",
+    "@types/node": "^24.10.1",
+    "@typescript-eslint/eslint-plugin": "^8.48.0",
+    "@typescript-eslint/parser": "^8.48.0",
+    "@vitest/coverage-v8": "^3.2.4",
+    "eslint": "^9.39.1",
+    "globals": "^16.5.0",
+    "jsdom": "^27.2.0",
+    "prettier": "^3.7.1",
+    "rollup": "^4.53.3",
+    "solid-js": "^1.9.10",
+    "tslib": "^2.8.1",
+    "typescript": "^5.9.3",
+    "vite-plugin-solid": "^2.11.10",
+    "vitest": "^3.2.4"
+  },
+  "peerDependencies": {
+    "@bemedev/app-solid": "^0.5.0",
+    "@bemedev/app-ts": "^1.4.3",
+    "@bemedev/decompose": "^1.4.0",
+    "@bemedev/types": "^0.4.2",
+    "solid-js": "^1.9.10",
+    "vitest": "^3.0.0"
+  }
+}

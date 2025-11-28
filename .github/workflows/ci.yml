@@ -31,3 +31,24 @@ jobs:
 
       - name: Test
         run: pnpm run test
+
+  test-package:
+    name: Test Package
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout pnpm repo
+        uses: 'chlbri/pnpmi-action@main'
+        with:
+          branch: ${{ inputs.branch }}
+
+      - name: Install test package dependencies
+        run: cd packages/test && pnpm install
+
+      - name: Lint test package
+        run: cd packages/test && pnpm run lint
+
+      - name: Build test package
+        run: cd packages/test && pnpm run build
