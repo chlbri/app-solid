@@ -4,10 +4,18 @@ Update CHANGELOG.md and README.md after version upgrade.
 
 ## Prerequisites
 
-Check version changed:
+Check version changed in the appropriate package.json:
+
+**For root package:**
 
 ```bash
 git --no-pager diff HEAD~1 HEAD -- package.json | grep version
+```
+
+**For packages/test:**
+
+```bash
+git --no-pager diff HEAD~1 HEAD -- packages/test/package.json | grep version
 ```
 
 If no version change: STOP.
@@ -16,7 +24,13 @@ If no version change: STOP.
 
 1. **Use #codebase** to understand recent changes
 
-2. **Update CHANGELOG.md** (top of file):
+2. **Determine which package changed:**
+   - Root package (`@bemedev/app-solid`) → Update root CHANGELOG.md &
+     README.md
+   - Test package (`@bemedev/app-solid-test`) → Update
+     packages/test/CHANGELOG.md & packages/test/README.md
+
+3. **Update CHANGELOG.md** (top of appropriate file):
 
 ```markdown
 <details>
@@ -38,10 +52,24 @@ If no version change: STOP.
 
 Order: Breaking changes → Features → Fixes → Docs → Refactor → Dependencies
 
-3. **Update README.md** only if:
+4. **Update README.md** only if:
    - New features need documentation
    - API changes
    - New examples needed
+
+5. **Package-specific guidelines:**
+
+   **Root package (@bemedev/app-solid):**
+   - Focus on Interpreter API, state management, SolidJS integration
+   - Include usage examples with `createInterpreter`
+   - Document `uiThread`, `provideOptions`, state matching methods
+
+   **Test package (@bemedev/app-solid-test):**
+   - Focus on testing utilities and helpers
+   - Document `createTests` API and test methods
+   - Include examples of testing interpreters with Vitest
+   - Show `testBy`, `createFakeWaiter`, and assertion helpers
+   - Explain how to test state transitions, context changes, UI thread
 
 **STOP HERE - DO NOT COMMIT**
 
