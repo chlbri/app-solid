@@ -1,109 +1,100 @@
-import {
-  createConfig,
-  createMachine,
-  EVENTS_FULL,
-  typings,
-} from '@bemedev/app-ts';
+import { createMachine, EVENTS_FULL, typings } from '@bemedev/app-ts';
 import { DELAY } from './constants';
 import { fakeDB } from './fakeDB';
-import { machine1 } from './machine1';
+import { machine1 } from './machine1.machine';
 
 // #region machine2
-
-export const config2 = createConfig({
-  initial: 'idle',
-  states: {
-    idle: {
-      tags: ['single'],
-      activities: {
-        DELAY: 'inc',
-      },
-      on: {
-        NEXT: '/working',
-      },
-    },
-    working: {
-      type: 'parallel',
-      activities: {
-        DELAY2: 'inc2',
-      },
-      on: {
-        FINISH: '/final',
-        NEXT: '/idle',
-      },
-      states: {
-        fetch: {
-          initial: 'idle',
-          states: {
-            idle: {
-              tags: ['double'],
-              activities: {
-                DELAY: 'sendPanelToUser',
-              },
-              on: {
-                FETCH: {
-                  guards: 'isInputNotEmpty',
-                  target: '/working/fetch/fetch',
-                },
-              },
-            },
-            fetch: {
-              promises: {
-                src: 'fetch',
-                then: {
-                  actions: {
-                    name: 'insertData',
-                    description: 'Database insert',
-                  },
-                  target: '/working/fetch/idle',
-                },
-                catch: '/working/fetch/idle',
-              },
-            },
-          },
-        },
-        ui: {
-          initial: 'idle',
-          states: {
-            idle: {
-              on: {
-                WRITE: {
-                  actions: 'write',
-                  target: '/working/ui/input',
-                },
-              },
-            },
-            input: {
-              activities: {
-                DELAY: {
-                  guards: 'isInputEmpty',
-                  actions: 'askUsertoInput',
-                },
-              },
-              on: {
-                WRITE: [
-                  {
-                    guards: 'isInputNotEmpty',
-                    actions: 'write',
-                    target: '/working/ui/idle',
-                  },
-                  '/working/ui/idle',
-                ],
-              },
-            },
-            final: {},
-          },
-        },
-      },
-    },
-    final: {},
-  },
-});
 
 export const machine2 = createMachine(
   {
     machines: { machine1: 'machine1' },
-    ...config2,
+    initial: 'idle',
+    states: {
+      idle: {
+        tags: ['single'],
+        activities: {
+          DELAY: 'inc',
+        },
+        on: {
+          NEXT: '/working',
+        },
+      },
+      working: {
+        type: 'parallel',
+        activities: {
+          DELAY2: 'inc2',
+        },
+        on: {
+          FINISH: '/final',
+          NEXT: '/idle',
+        },
+        states: {
+          fetch: {
+            initial: 'idle',
+            states: {
+              idle: {
+                tags: ['double'],
+                activities: {
+                  DELAY: 'sendPanelToUser',
+                },
+                on: {
+                  FETCH: {
+                    guards: 'isInputNotEmpty',
+                    target: '/working/fetch/fetch',
+                  },
+                },
+              },
+              fetch: {
+                promises: {
+                  src: 'fetch',
+                  then: {
+                    actions: {
+                      name: 'insertData',
+                      description: 'Database insert',
+                    },
+                    target: '/working/fetch/idle',
+                  },
+                  catch: '/working/fetch/idle',
+                },
+              },
+            },
+          },
+          ui: {
+            initial: 'idle',
+            states: {
+              idle: {
+                on: {
+                  WRITE: {
+                    actions: 'write',
+                    target: '/working/ui/input',
+                  },
+                },
+              },
+              input: {
+                activities: {
+                  DELAY: {
+                    guards: 'isInputEmpty',
+                    actions: 'askUsertoInput',
+                  },
+                },
+                on: {
+                  WRITE: [
+                    {
+                      guards: 'isInputNotEmpty',
+                      actions: 'write',
+                      target: '/working/ui/idle',
+                    },
+                    '/working/ui/idle',
+                  ],
+                },
+              },
+              final: {},
+            },
+          },
+        },
+      },
+      final: {},
+    },
   },
   typings({
     eventsMap: {

@@ -2,7 +2,7 @@ import { createMachine, typings } from '@bemedev/app-ts';
 import { DELAY } from './constants';
 
 // #region machine1
-export const machine1 = createMachine(
+export const machine11 = createMachine(
   {
     initial: 'idle',
     entry: 'init',
@@ -16,7 +16,11 @@ export const machine1 = createMachine(
           INIT: { actions: ['init'] },
         },
       },
-      final: {},
+      final: {
+        on: {
+          NEXT: { target: '/idle', description: 'Restart' },
+        },
+      },
     },
   },
   typings({
@@ -30,9 +34,7 @@ export const machine1 = createMachine(
       iterator: 'number',
     }),
   }),
-);
-
-machine1.addOptions(({ assign }) => ({
+).provideOptions(({ assign }) => ({
   actions: {
     init: assign('context.iterator', () => 0),
     inc: assign(
@@ -45,5 +47,5 @@ machine1.addOptions(({ assign }) => ({
   },
 }));
 
-export type Machine1 = typeof machine1;
+export type Machine11 = typeof machine11;
 // #endregion

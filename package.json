@@ -53,6 +53,8 @@
     "config": "pnpm install",
     "config:off": "pnpm run config --offline",
     "eslint": "eslint \"{src/**/*,App}.{ts,tsx}\"",
+    "gen:app": "app-typings generate",
+    "gen:app:watch": "pnpm run gen:app --watch",
     "lint": "pnpm run prettier && pnpm run eslint --fix",
     "lint:watch": "onchange --await-write-finish 5500 \"**/*\" -- pnpm run lint",
     "prepublishOnly": "",
@@ -86,7 +88,8 @@
     }
   ],
   "devDependencies": {
-    "@bemedev/app-ts": "^1.4.6",
+    "@bemedev/app-cli": "^0.1.7",
+    "@bemedev/app-ts": "^1.5.0",
     "@bemedev/decompose": "1.4.0",
     "@bemedev/fsf": "^1.0.1",
     "@bemedev/rollup-config": "^0.2.2",
