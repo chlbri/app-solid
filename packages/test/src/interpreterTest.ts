@@ -237,7 +237,7 @@ class InterpreterTest<const M extends AnyMachine, S extends Ru> {
   contains = (...values: string[]) => {
     return tuple(
       this.#buildInvite(
-        `The current "value" matches : (${values.join(', ')})`,
+        `The current "value" contains : (${values.join(', ')})`,
       ),
       () => {
         const actual = createRoot(
