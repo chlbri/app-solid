@@ -8,6 +8,38 @@
 
 <h3>
 
+**[0.5.0]** - 2025/11/28 => _23:59_
+
+</h3>
+
+</summary>
+
+- feat: Add `Interpreter` class with state and UI signal management
+- feat: Add `provideOptions` method to interpreter for runtime options
+  override
+- refactor: Improve interpreter test methods for better readability and
+  functionality
+- refactor: Restructure machine exports and consolidate machine definitions
+- refactor: Simplify `__stateSignal` typing for better type safety
+- refactor: Remove old test files and consolidate interpreter tests
+- test: Add comprehensive tests for interpreter functionality and lifecycle
+  methods
+- test: Add test coverage for `provideOptions` with custom actions
+- test: Enhance tag testing with parallel and single state tags
+- fix: Fix `#initialState` reducer logic to properly initialize empty
+  objects
+- Update `@bemedev/app-ts` to v1.6.0
+- <u>Test coverage **_100%_**</u>
+
+</details>
+
+<br/>
+
+<details>
+<summary>
+
+<h3>
+
 **[0.4.1]** - 2025/11/24 => _18:30_
 
 </h3>

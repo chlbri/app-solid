@@ -17,7 +17,7 @@ jobs:
       - name: Setup node for publication
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '22'
           always-auth: true
           registry-url: 'https://registry.npmjs.org'
           scope: '@bemedev'
@@ -67,4 +67,6 @@ jobs:
 
       - name: Check - not updated
         if: ${{ ! steps.publish.outputs.type }}
-        run: echo "Remain the same! - ${{ steps.publish.outputs.version }}"
+        run:
+          echo "Versoin remains the same! - ${{
+          steps.publish.outputs.version }}"

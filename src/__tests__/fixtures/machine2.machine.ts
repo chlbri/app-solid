@@ -24,6 +24,7 @@ export const machine2 = createMachine(
         activities: {
           DELAY2: 'inc2',
         },
+        tags: 'parallel',
         on: {
           FINISH: '/final',
           NEXT: '/idle',

@@ -47,7 +47,7 @@ class Interpreter<const M extends AnyMachine, S extends Ru>
   }
 
   get __stateSignal() {
-    return {} as StateSignal<M, S>;
+    return undefined as unknown as StateSignal<M, S>;
   }
 
   #setUI = () => {
@@ -118,7 +118,6 @@ class Interpreter<const M extends AnyMachine, S extends Ru>
                 [key, signal()] as [keyof S, S[keyof S]],
             )
             .reduce((acc, [key, value]) => {
-              if (!acc) acc = {} as any;
               acc[key] = value;
               return acc;
             }, {} as any)

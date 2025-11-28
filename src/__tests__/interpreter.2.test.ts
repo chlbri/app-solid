@@ -55,11 +55,12 @@ describe('machine2', async () => {
   it(...iterator('iterator', 20));
   it(...iteratorNoChanges('iteratorNoChanges', 0));
   it(...wait(30));
-  it.fails(...inter.hasTags('single'));
+  it(...inter.hasTags('single'));
   it(...iterator('iterator', 50));
   it(...iteratorNoChanges('iteratorNoChanges', 0));
   it(...inter.send('NEXT'));
-  it.fails(...inter.hasTags('double'));
+  it(...inter.hasTags('double'));
+  it(...inter.hasTags('parallel'));
 
   it(
     ...testValue('After NEXT, value is inside "working"', {
@@ -111,6 +112,8 @@ describe('machine2', async () => {
     }),
   );
 
+  it(...inter.hasTags('parallel', 'double'));
+  it.fails(...inter.hasTags('single'));
   it(...wait(100));
   it(...iterator('iterator', 350));
 

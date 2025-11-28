@@ -27,4 +27,7 @@ describe('machine3', async () => {
   it(...testAge('Initial age', 0));
   it(...inter.stop);
   it('#18 => async dispose symbol', _inter[Symbol.asyncDispose]);
+  it('#coveage => typings', () => {
+    expect(_inter.__stateSignal).toBeUndefined();
+  });
 });

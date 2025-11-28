@@ -2,22 +2,28 @@
 
 <br/>
 
-A TypeScript middleware for integrating `@bemedev/app-ts` finite state machines with SolidJS.
+A TypeScript middleware for integrating `@bemedev/app-ts` finite state
+machines with SolidJS.
 
 <br/>
 
 ## Description
 
-This library serves as a bridge between `@bemedev/app-ts` (finite state machine library) and SolidJS, enabling the use of reactive state machines in SolidJS applications.
+This library serves as a bridge between `@bemedev/app-ts` (finite state
+machine library) and SolidJS, enabling the use of reactive state machines
+in SolidJS applications.
 
 <br/>
 
 ## Key Features
 
-- 🔗 **SolidJS Integration**: Connects `@bemedev/app-ts` state machines with SolidJS signals
-- ⚡ **Reactivity**: Automatic synchronization between machine state and SolidJS components
+- 🔗 **SolidJS Integration**: Connects `@bemedev/app-ts` state machines
+  with SolidJS signals
+- ⚡ **Reactivity**: Automatic synchronization between machine state and
+  SolidJS components
 - 🎯 **TypeScript Types**: Preserves type safety between both libraries
-- 🔄 **Transparent Middleware**: Simple interface for using state machines in SolidJS
+- 🔄 **Transparent Middleware**: Simple interface for using state machines
+  in SolidJS
 
 <br/>
 
@@ -34,6 +40,145 @@ npm install @bemedev/app-solid @bemedev/app-ts solid-js
 ```bash
 pnpm install @bemedev/app-solid @bemedev/app-ts solid-js
 ```
+
+<br/>
+
+## Usage
+
+### Basic Example
+
+```typescript
+import { createInterpreter } from '@bemedev/app-solid';
+import { createMachine } from '@bemedev/app-ts';
+
+// Define your state machine
+const toggleMachine = createMachine({
+  initial: 'inactive',
+  states: {
+    inactive: {
+      on: { TOGGLE: '/active' }
+    },
+    active: {
+      on: { TOGGLE: '/inactive' }
+    }
+  }
+});
+
+// Create an interpreter
+const interpreter = createInterpreter({
+  machine: toggleMachine,
+  options: {
+    context: {},
+    pContext: {}
+  }
+});
+
+// Start the interpreter
+interpreter.start();
+
+// In your SolidJS component
+function MyComponent() {
+  const value = interpreter.value();
+  const currentState = value();
+
+  return (
+    <div>
+      <p>Current state: {currentState}</p>
+      <button onClick={() => interpreter.send('TOGGLE')}>
+        Toggle
+      </button>
+    </div>
+  );
+}
+```
+
+### Runtime Options Override
+
+You can override machine options at runtime using `provideOptions`:
+
+```typescript
+const interpreter = createInterpreter({
+  machine: myMachine,
+  options: {
+    context: { count: 0 },
+    pContext: {},
+  },
+}).provideOptions(({ assign }) => ({
+  actions: {
+    increment: assign(
+      'context.count',
+      ({ context: { count } }) => count + 2,
+    ),
+  },
+}));
+```
+
+### State Matching & Tags
+
+```typescript
+// Check if current state matches
+const isActive = interpreter.matches('active');
+
+// Check if state contains a value
+const hasWorking = interpreter.contains('working');
+
+// Check for tags
+const hasTags = interpreter.hasTags('loading', 'visible');
+```
+
+### UI Thread (External State Management)
+
+You can add UI state that exists outside the machine's internal state using
+`uiThread`. This is useful for managing UI-specific state (like form
+inputs, loading indicators, etc.) that needs to be reactive but shouldn't
+be part of the machine's state logic. Generally, it's a problem of speed.
+
+```typescript
+import { createSignal } from 'solid-js';
+
+// Define UI signals outside the machine
+const [username, setUsername] = createSignal('');
+const [email, setEmail] = createSignal('');
+
+const interpreter = createInterpreter({
+  machine: myMachine,
+  options: {
+    context: {},
+    pContext: {}
+  },
+  uiThread: {
+    username: [username, setUsername],
+    email: [email, setEmail]
+  }
+});
+
+// Access UI state in components
+function MyComponent() {
+  const ui = interpreter.ui();
+  const currentUsername = ui()?.username;
+
+  return (
+    <div>
+      <input
+        value={currentUsername || ''}
+        onInput={(e) => interpreter.sendUI({
+          type: 'username',
+          payload: e.currentTarget.value
+        })}
+      />
+    </div>
+  );
+}
+```
+
+**Key points:**
+
+- UI thread state is **separate** from the machine's internal context
+- Perfect for form inputs, UI toggles, and temporary UI state
+- Very fast for efficent UI updates, avoiding unnecessary machine state
+  transitions
+- Reactive through SolidJS signals
+- Accessible via `interpreter.ui()` and `interpreter.sendUI()`
 
 <br/>
 
