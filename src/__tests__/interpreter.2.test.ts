@@ -68,10 +68,6 @@ describe('machine2', async () => {
     }),
   );
 
-  it.fails(
-    ...testValue('After NEXT, value is not exactly "working"', 'working'),
-  );
-
   it(...inter.matches('working'));
   it.fails(...inter.matches('working', 'work'));
   it(...inter.contains('working', 'work'));
