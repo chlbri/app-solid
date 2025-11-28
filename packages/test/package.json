@@ -56,7 +56,7 @@
   },
   "devDependencies": {
     "@bemedev/app-cli": "^0.1.7",
-    "@bemedev/app-solid": "^0.5.0",
+    "@bemedev/app-solid": "link:../..",
     "@bemedev/app-ts": "^1.6.0",
     "@bemedev/decompose": "1.4.0",
     "@bemedev/rollup-config": "^0.2.2",
