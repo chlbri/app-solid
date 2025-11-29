@@ -9,10 +9,10 @@ importers:
     devDependencies:
       '@bemedev/app-cli':
         specifier: ^0.1.7
-        version: 0.1.7(@bemedev/app-ts@1.6.0(@bemedev/types@0.4.2)(vitest@3.2.4(@types/node@24.10.1)(jsdom@27.2.0)))(@bemedev/types@0.4.2)(vitest@3.2.4(@types/node@24.10.1)(jsdom@27.2.0))
+        version: 0.1.7(@bemedev/app-ts@1.6.1(@bemedev/types@0.4.2)(vitest@3.2.4(@types/node@24.10.1)(jsdom@27.2.0)))(@bemedev/types@0.4.2)(vitest@3.2.4(@types/node@24.10.1)(jsdom@27.2.0))
       '@bemedev/app-ts':
-        specifier: ^1.6.0
-        version: 1.6.0(@bemedev/types@0.4.2)(vitest@3.2.4(@types/node@24.10.1)(jsdom@27.2.0))
+        specifier: ^1.6.1
+        version: 1.6.1(@bemedev/types@0.4.2)(vitest@3.2.4(@types/node@24.10.1)(jsdom@27.2.0))
       '@bemedev/decompose':
         specifier: 1.4.0
         version: 1.4.0(@bemedev/types@0.4.2)(vitest@3.2.4(@types/node@24.10.1)(jsdom@27.2.0))
@@ -86,11 +86,11 @@ importers:
         specifier: ^7.1.0
         version: 7.1.0
       prettier:
-        specifier: ^3.7.1
-        version: 3.7.1
+        specifier: ^3.7.2
+        version: 3.7.2
       pretty-quick:
         specifier: ^4.2.2
-        version: 4.2.2(prettier@3.7.1)
+        version: 4.2.2(prettier@3.7.2)
       rollup:
         specifier: ^4.53.3
         version: 4.53.3
@@ -313,10 +313,10 @@ packages:
     peerDependencies:
       '@bemedev/app-ts': ^0.9.20
 
-  '@bemedev/app-ts@1.6.0':
+  '@bemedev/app-ts@1.6.1':
     resolution:
       {
-        integrity: sha512-TqQ0dOpLLfo+qxrN/riB3vJyw3jwiM95UqGF4Oxtg1/tAKYUkapqYIRU4tmOqawuDePWAo+Bx5UxawrFMvOKNA==,
+        integrity: sha512-O8oNYRfqCLOHCZcboeQqewLO6KQ7ebYV1WtwiM05iNw0WnT/9NW8VK8dcsAQQRRb+L84LEfsw1AYi/6xNlqpvA==,
       }
     engines: { node: '>=22' }
 
@@ -472,10 +472,10 @@ packages:
     peerDependencies:
       '@csstools/css-tokenizer': ^3.0.4
 
-  '@csstools/css-syntax-patches-for-csstree@1.0.19':
+  '@csstools/css-syntax-patches-for-csstree@1.0.20':
     resolution:
       {
-        integrity: sha512-QW5/SM2ARltEhoKcmRI1LoLf3/C7dHGswwCnfLcoMgqurBT4f8GvwXMgAbK/FwcxthmJRK5MGTtddj0yQn0J9g==,
+        integrity: sha512-8BHsjXfSciZxjmHQOuVdW2b8WLUPts9a+mfL13/PzEviufUEW2xnvQuOlKs9dRBHgRqJ53SF/DUoK9+MZk72oQ==,
       }
     engines: { node: '>=18' }
 
@@ -2912,10 +2912,10 @@ packages:
       }
     engines: { node: '>= 0.8.0' }
 
-  prettier@3.7.1:
+  prettier@3.7.2:
     resolution:
       {
-        integrity: sha512-RWKXE4qB3u5Z6yz7omJkjWwmTfLdcbv44jUVHC5NpfXwFGzvpQM798FGv/6WNK879tc+Cn0AAyherCl1KjbyZQ==,
+        integrity: sha512-n3HV2J6QhItCXndGa3oMWvWFAgN1ibnS7R9mt6iokScBOC0Ul9/iZORmU2IWUMcyAQaMPjTlY3uT34TqocUxMA==,
       }
     engines: { node: '>=14' }
     hasBin: true
@@ -3852,9 +3852,9 @@ snapshots:
 
   '@bcoe/v8-coverage@1.0.2': {}
 
-  '@bemedev/app-cli@0.1.7(@bemedev/app-ts@1.6.0(@bemedev/types@0.4.2)(vitest@3.2.4(@types/node@24.10.1)(jsdom@27.2.0)))(@bemedev/types@0.4.2)(vitest@3.2.4(@types/node@24.10.1)(jsdom@27.2.0))':
+  '@bemedev/app-cli@0.1.7(@bemedev/app-ts@1.6.1(@bemedev/types@0.4.2)(vitest@3.2.4(@types/node@24.10.1)(jsdom@27.2.0)))(@bemedev/types@0.4.2)(vitest@3.2.4(@types/node@24.10.1)(jsdom@27.2.0))':
     dependencies:
-      '@bemedev/app-ts': 1.6.0(@bemedev/types@0.4.2)(vitest@3.2.4(@types/node@24.10.1)(jsdom@27.2.0))
+      '@bemedev/app-ts': 1.6.1(@bemedev/types@0.4.2)(vitest@3.2.4(@types/node@24.10.1)(jsdom@27.2.0))
       '@bemedev/decompose': 1.4.0(@bemedev/types@0.4.2)(vitest@3.2.4(@types/node@24.10.1)(jsdom@27.2.0))
       chokidar: 4.0.3
       cmd-ts: 0.14.3
@@ -3866,7 +3866,7 @@ snapshots:
       - supports-color
       - vitest
 
-  '@bemedev/app-ts@1.6.0(@bemedev/types@0.4.2)(vitest@3.2.4(@types/node@24.10.1)(jsdom@27.2.0))':
+  '@bemedev/app-ts@1.6.1(@bemedev/types@0.4.2)(vitest@3.2.4(@types/node@24.10.1)(jsdom@27.2.0))':
     dependencies:
       '@bemedev/basifun': 0.5.3
       '@bemedev/boolean-recursive': 0.0.3
@@ -3971,7 +3971,7 @@ snapshots:
     dependencies:
       '@csstools/css-tokenizer': 3.0.4
 
-  '@csstools/css-syntax-patches-for-csstree@1.0.19': {}
+  '@csstools/css-syntax-patches-for-csstree@1.0.20': {}
 
   '@csstools/css-tokenizer@3.0.4': {}
 
@@ -4662,7 +4662,7 @@ snapshots:
   cssstyle@5.3.3:
     dependencies:
       '@asamuzakjp/css-color': 4.1.0
-      '@csstools/css-syntax-patches-for-csstree': 1.0.19
+      '@csstools/css-syntax-patches-for-csstree': 1.0.20
       css-tree: 3.1.0
 
   csstype@3.2.3: {}
@@ -5337,7 +5337,7 @@ snapshots:
 
   prelude-ls@1.2.1: {}
 
-  prettier@3.7.1: {}
+  prettier@3.7.2: {}
 
   pretty-format@27.5.1:
     dependencies:
@@ -5345,14 +5345,14 @@ snapshots:
       ansi-styles: 5.2.0
       react-is: 17.0.2
 
-  pretty-quick@4.2.2(prettier@3.7.1):
+  pretty-quick@4.2.2(prettier@3.7.2):
     dependencies:
       '@pkgr/core': 0.2.9
       ignore: 7.0.5
       mri: 1.2.0
       picocolors: 1.1.1
       picomatch: 4.0.3
-      prettier: 3.7.1
+      prettier: 3.7.2
       tinyexec: 0.3.2
       tslib: 2.8.1
 

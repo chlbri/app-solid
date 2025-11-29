@@ -8,6 +8,30 @@
 
 <h3>
 
+**[0.5.1]** - 2025/11/29 => _11:30_
+
+</h3>
+
+</summary>
+
+- refactor: Update imports to use more specific paths from
+  `@bemedev/app-ts` v1.6.1
+- refactor: Improve code organization with better import structure
+- fix: Remove debug console.logs for tags subscription
+- docs: Add `@deprecated` annotation to `__isUsedUi` test helper
+- Update `@bemedev/app-ts` to v1.6.1
+- Update `prettier` to v3.7.2
+- <u>Test coverage **_100%_**</u>
+
+</details>
+
+<br/>
+
+<details>
+<summary>
+
+<h3>
+
 **[0.5.0]** - 2025/11/28 => _23:59_
 
 </h3>

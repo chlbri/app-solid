@@ -1,6 +1,6 @@
 {
   "name": "@bemedev/app-solid",
-  "version": "0.5.0",
+  "version": "0.5.1",
   "description": "Middleware between @bemedev/app-ts and solidjs",
   "author": {
     "email": "bri_lvi@icloud.com",
@@ -89,7 +89,7 @@
   ],
   "devDependencies": {
     "@bemedev/app-cli": "^0.1.7",
-    "@bemedev/app-ts": "^1.6.0",
+    "@bemedev/app-ts": "^1.6.1",
     "@bemedev/decompose": "1.4.0",
     "@bemedev/fsf": "^1.0.1",
     "@bemedev/rollup-config": "^0.2.2",
@@ -114,7 +114,7 @@
     "husky": "^9.1.7",
     "jsdom": "^27.2.0",
     "onchange": "^7.1.0",
-    "prettier": "^3.7.1",
+    "prettier": "^3.7.2",
     "pretty-quick": "^4.2.2",
     "rollup": "^4.53.3",
     "size-limit": "^12.0.0",

@@ -3,7 +3,6 @@ import type {
   Ru,
   SoA,
 } from '@bemedev/app-ts/lib/libs/bemedev/globals/types';
-import type { StateValue } from '@bemedev/decompose';
 import {
   createRoot,
   getOwner,
@@ -15,6 +14,7 @@ import { defaultSelector } from '../../default';
 import type { Interpreter } from '../../interpreter';
 import type { State_F, StateSignal } from '../../interpreter.types';
 import { tuple } from './tuple';
+import type { StateValue } from '@bemedev/app-ts/lib/states';
 
 type TestFn = <T>(args: {
   invite: string;
@@ -246,6 +246,10 @@ class InterpreterTest<const M extends AnyMachine, S extends Ru> {
     );
   };
 
+  /**
+   * @deprecated
+   * Only for testing purposes
+   */
   get __isUsedUi() {
     return this._service.__isUsedUi;
   }

@@ -6,16 +6,17 @@ import {
   type InterpreterOptions,
   type WorkingStatus,
 } from '@bemedev/app-ts';
-import { DEFAULT_DELIMITER as replacement } from '@bemedev/app-ts/lib/constants/index.js';
-import { INIT_EVENT } from '@bemedev/app-ts/lib/events';
+import { DEFAULT_DELIMITER as replacement } from '@bemedev/app-ts/lib/constants/strings.js';
+import { INIT_EVENT } from '@bemedev/app-ts/lib/events/constants.js';
 import type {
   Ru,
   SoA,
 } from '@bemedev/app-ts/lib/libs/bemedev/globals/types';
-import type { StateValue } from '@bemedev/app-ts/lib/states';
+import type { StateValue } from '@bemedev/app-ts/lib/states/types';
 import { merge } from '@bemedev/app-ts/lib/utils/merge.js';
 import { createMemo, createSignal, untrack, type Signal } from 'solid-js';
 import { defaultSelector } from './default';
+import { asyncify } from './helpers';
 import type {
   AddOptions_F,
   Options,
@@ -23,7 +24,6 @@ import type {
   State_F,
   StateSignal,
 } from './interpreter.types';
-import { asyncify } from './helpers';
 
 class Interpreter<const M extends AnyMachine, S extends Ru>
   implements Disposable, AsyncDisposable
@@ -86,11 +86,6 @@ class Interpreter<const M extends AnyMachine, S extends Ru>
 
     this.subscribe(next => {
       this.#setState(prev => merge(prev, next));
-    });
-
-    this.subscribe(({ tags }) => {
-      console.log('TAGS', tags);
-      console.log('TAGS --- ', this.#service.config.tags);
     });
 
     if (uiThread) {

@@ -25,7 +25,7 @@ describe('machine1', async () => {
     it(...inter.start);
     it(...testValue('Initial value', 'idle'));
     it('#01.b => is not a UI service', () => {
-      expect(_inter.__isUsedUi).toBe(false);
+      expect(inter.__isUsedUi).toBe(false);
     });
     it(...iterator('iterator', 0));
     it(...wait(1));

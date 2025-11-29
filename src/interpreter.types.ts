@@ -7,8 +7,8 @@ import type {
 import type {
   Ru,
   SoA,
-} from '@bemedev/app-ts/lib/libs/bemedev/globals/types.js';
-import type { StateValue } from '@bemedev/app-ts/lib/states';
+} from '@bemedev/app-ts/lib/libs/bemedev/globals/types';
+import type { StateValue } from '@bemedev/app-ts/lib/states/types';
 import type { Accessor, Setter, Signal } from 'solid-js';
 
 export type ToSignals<T extends Ru> = {
