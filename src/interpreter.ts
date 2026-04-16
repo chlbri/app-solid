@@ -8,11 +8,6 @@ import {
 } from '@bemedev/app-ts';
 import { DEFAULT_DELIMITER as replacement } from '@bemedev/app-ts/lib/constants/strings.js';
 import { INIT_EVENT } from '@bemedev/app-ts/lib/events/constants.js';
-import type {
-  Ru,
-  SoA,
-} from '@bemedev/app-ts/lib/libs/bemedev/globals/types.js';
-import type { StateValue } from '@bemedev/app-ts/lib/states/types.js';
 import { merge } from '@bemedev/app-ts/lib/utils/merge.js';
 import { createMemo, createSignal, untrack, type Signal } from 'solid-js';
 import { defaultSelector } from './default';
@@ -23,6 +18,9 @@ import type {
   SendUI_F,
   State_F,
   StateSignal,
+  Ru,
+  SoA,
+  StateValue,
 } from './interpreter.types';
 
 class Interpreter<const M extends AnyMachine, S extends Ru>

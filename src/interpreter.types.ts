@@ -10,6 +10,7 @@ import type {
 } from '@bemedev/app-ts/lib/libs/bemedev/globals/types';
 import type { StateValue } from '@bemedev/app-ts/lib/states/types';
 import type { Accessor, Setter, Signal } from 'solid-js';
+export type { Ru, SoA, StateValue };
 
 export type ToSignals<T extends Ru> = {
   [K in keyof T]?: Signal<T[K] | undefined>;

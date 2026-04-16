@@ -1,4 +1,4 @@
-import { createTests } from '@bemedev/vitest-extended';
+import { createTests } from '@bemedev/dev-utils/vitest-extended';
 import { defaultSelector } from '../default';
 
 describe('#01 => default', () => {

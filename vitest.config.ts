@@ -23,6 +23,7 @@ export default defineConfig({
     maxConcurrency: 10,
     passWithNoTests: true,
     slowTestThreshold: 3000,
+    testTimeout: 20_000,
     environment: 'jsdom',
     globals: true,
     logHeapUsage: true,

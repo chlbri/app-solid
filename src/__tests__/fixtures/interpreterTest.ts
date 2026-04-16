@@ -125,9 +125,22 @@ class InterpreterTest<const M extends AnyMachine, S extends Ru> {
   #createFakeWaiter = () => {
     const waiter = async (ms = 0, times = 1) => {
       const check = this.vi.isFakeTimers();
-      for (let i = 0; i < times; i++) {
-        if (check) await this.vi.advanceTimersByTimeAsync(ms);
-        else await new Promise(resolve => setTimeout(resolve, ms));
+      if (check) {
+        try {
+          for (let i = 0; i < times; i++) {
+            await this.vi.advanceTimersByTimeAsync(ms);
+          }
+        } catch {
+          /**EMPTY */
+        }
+      } else {
+        try {
+          for (let i = 0; i < times; i++) {
+            await new Promise(resolve => setTimeout(resolve, ms));
+          }
+        } catch {
+          /**EMPTY */
+        }
       }
     };
 

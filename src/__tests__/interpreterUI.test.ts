@@ -54,7 +54,7 @@ describe('machine1', async () => {
   it(...inter.send('NEXT'));
   it(...testValue('Value is now at "final"', 'final'));
   it(...iterator('iterator', 13));
-  it(...wait(1000));
+  it(...wait(100));
   it(...iterator('iterator', 13));
 
   it(
@@ -65,7 +65,7 @@ describe('machine1', async () => {
   );
 
   it(...counter('UI counter is now at "42"', 42));
-  it(...wait(1000));
+  it(...wait(100));
 
   it(
     ...inter.sendUI({
