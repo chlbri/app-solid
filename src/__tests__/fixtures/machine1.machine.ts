@@ -29,10 +29,9 @@ export const machine1 = createMachine(
       INIT: 'primitive',
     },
     promiseesMap: {},
-    pContext: 'primitive',
-    context: typings.partial({
+    context: {
       iterator: 'number',
-    }),
+    },
   }),
 ).provideOptions(({ assign }) => ({
   actions: {

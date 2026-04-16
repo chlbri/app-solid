@@ -1,4 +1,4 @@
-import { createMachine, EVENTS_FULL, typings } from '@bemedev/app-ts';
+import { createMachine, interpret, typings } from '@bemedev/app-ts';
 import { DELAY } from './constants';
 import { fakeDB } from './fakeDB';
 import { machine1 } from './machine1.machine';
@@ -7,7 +7,13 @@ import { machine1 } from './machine1.machine';
 
 export const machine2 = createMachine(
   {
-    machines: { machine1: 'machine1' },
+    actors: {
+      machine1: {
+        contexts: {
+          iterator: 'iterator',
+        },
+      },
+    },
     initial: 'idle',
     states: {
       idle: {
@@ -46,16 +52,17 @@ export const machine2 = createMachine(
                 },
               },
               fetch: {
-                promises: {
-                  src: 'fetch',
-                  then: {
-                    actions: {
-                      name: 'insertData',
-                      description: 'Database insert',
+                actors: {
+                  fetch: {
+                    resolves: {
+                      actions: {
+                        name: 'insertData',
+                        description: 'Database insert',
+                      },
+                      target: '/working/fetch/idle',
                     },
-                    target: '/working/fetch/idle',
+                    catch: '/working/fetch/idle',
                   },
-                  catch: '/working/fetch/idle',
                 },
               },
             },
@@ -112,63 +119,58 @@ export const machine2 = createMachine(
       input: 'string',
       data: typings.array({ _id: 'string', name: 'string' }),
     },
-    promiseesMap: {
-      fetch: {
-        then: typings.array({ _id: 'string', name: 'string' }),
-        catch: 'primitive',
+    actorsMap: {
+      promisees: {
+        fetch: {
+          resolves: typings.array({ _id: 'string', name: 'string' }),
+          catch: 'primitive',
+        },
+      },
+      children: {
+        machine1: {},
       },
     },
   }),
-).provideOptions(
-  ({ isNotValue, isValue, createChild, assign, voidAction }) => ({
-    actions: {
-      inc: assign(
-        'context.iterator',
-        ({ context: { iterator } }) => iterator + 1,
-      ),
-      inc2: assign(
-        'context.iterator',
-        ({ context: { iterator } }) => iterator + 4,
-      ),
-      sendPanelToUser: voidAction(() => console.log('sendPanelToUser')),
-      askUsertoInput: voidAction(() => console.log('Input, please !!')),
-      write: assign('context.input', {
-        WRITE: ({ payload: { value } }) => value,
-      }),
-      insertData: assign('context.data', {
-        'fetch::then': ({ payload, context: { data } }) => {
-          data.push(...payload);
-          return data;
-        },
-      }),
-    },
-    predicates: {
-      isInputEmpty: isValue('context.input', ''),
-      isInputNotEmpty: isNotValue('context.input', ''),
-    },
+).provideOptions(({ isNotValue, isValue, assign, voidAction }) => ({
+  actions: {
+    inc: assign(
+      'context.iterator',
+      ({ context: { iterator } }) => iterator + 1,
+    ),
+    inc2: assign(
+      'context.iterator',
+      ({ context: { iterator } }) => iterator + 4,
+    ),
+    sendPanelToUser: voidAction(() => console.log('sendPanelToUser')),
+    askUsertoInput: voidAction(() => console.log('Input, please !!')),
+    write: assign('context.input', {
+      WRITE: ({ payload: { value } }) => value,
+    }),
+    insertData: assign('context.data', {
+      'fetch::then': ({ payload, context: { data } }) => {
+        data.push(...payload);
+        return data;
+      },
+    }),
+  },
+  predicates: {
+    isInputEmpty: isValue('context.input', ''),
+    isInputNotEmpty: isNotValue('context.input', ''),
+  },
+  actors: {
     promises: {
       fetch: async ({ context: { input } }) => {
         return fakeDB.filter(item => item.name.includes(input));
       },
     },
-    delays: {
-      DELAY,
-      DELAY2: 2 * DELAY,
+    children: {
+      machine1: () => interpret(machine1, { context: { iterator: 0 } }),
     },
-    machines: {
-      machine1: createChild(
-        machine1,
-        {
-          pContext: {},
-          context: { iterator: 0 },
-        },
-        {
-          events: EVENTS_FULL,
-          contexts: { iterator: 'iterator' },
-        },
-      ),
-    },
-  }),
-);
+  },
+  delays: {
+    DELAY,
+    DELAY2: 2 * DELAY,
+  },
+}));
 
 // #endregion

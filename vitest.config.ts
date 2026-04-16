@@ -1,5 +1,5 @@
-import { aliasTs } from '@bemedev/vitest-alias';
-import { exclude } from '@bemedev/vitest-exclude';
+import { aliasTs } from '@bemedev/dev-utils/vitest-alias';
+import { exclude } from '@bemedev/dev-utils/vitest-exclude';
 import { defineConfig } from 'vitest/config';
 import tsconfig from './tsconfig.json';
 import solidPlugin from 'vite-plugin-solid';
@@ -16,7 +16,7 @@ export default defineConfig({
         '**/fixtures/**/*.ts',
       ],
     }),
-    solidPlugin(),
+    solidPlugin() as any,
   ],
   test: {
     bail: 10,

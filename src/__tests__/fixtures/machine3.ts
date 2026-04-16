@@ -45,10 +45,9 @@ export const config3 = createConfig({
         },
         '/state1/state11',
       ],
-      promises: [
-        {
-          src: 'promise1',
-          then: { actions: 'action1' },
+      actors: {
+        promise1: {
+          resolves: { actions: 'action1' },
           catch: [
             { guards: 'ert', actions: 'action14' },
             '/state1/state12',
@@ -65,9 +64,8 @@ export const config3 = createConfig({
             'action22',
           ],
         },
-        {
-          src: 'promise2',
-          then: [
+        promise2: {
+          resolves: [
             { actions: 'action4', guards: 'guard2' },
             { actions: 'action3' },
           ],
@@ -83,10 +81,16 @@ export const config3 = createConfig({
             'action20',
           ],
         },
-      ],
+      },
     },
   },
-  machines: { description: 'A beautiful machine', name: 'machine1' },
+  actors: {
+    machine1: {
+      contexts: {
+        iterator: 'iterator',
+      },
+    },
+  },
 });
 
 export const machine3 = createMachine(
@@ -97,9 +101,23 @@ export const machine3 = createMachine(
       EVENT2: 'boolean',
       EVENT3: { login: 'string', pwd: 'string' },
     },
-    promiseesMap: {},
-    pContext: { data: 'string' },
+    pContext: { data: 'string', iterator: 'number' },
     context: { age: 'number' },
+    actorsMap: {
+      children: {
+        machine1: {},
+      },
+      promisees: {
+        promise1: {
+          resolves: 'primitive',
+          catch: 'primitive',
+        },
+        promise2: {
+          resolves: 'primitive',
+          catch: 'primitive',
+        },
+      },
+    },
   }),
 );
 

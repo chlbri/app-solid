@@ -11,8 +11,8 @@ import { INIT_EVENT } from '@bemedev/app-ts/lib/events/constants.js';
 import type {
   Ru,
   SoA,
-} from '@bemedev/app-ts/lib/libs/bemedev/globals/types';
-import type { StateValue } from '@bemedev/app-ts/lib/states/types';
+} from '@bemedev/app-ts/lib/libs/bemedev/globals/types.js';
+import type { StateValue } from '@bemedev/app-ts/lib/states/types.js';
 import { merge } from '@bemedev/app-ts/lib/utils/merge.js';
 import { createMemo, createSignal, untrack, type Signal } from 'solid-js';
 import { defaultSelector } from './default';
@@ -291,4 +291,4 @@ export const createInterpreter: Interpreter_F = args => {
   return new Interpreter(args as any);
 };
 
-export const interpret = createInterpreter;
+export const interpret: Interpreter_F = createInterpreter;
