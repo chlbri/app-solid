@@ -10,16 +10,16 @@ importers:
     devDependencies:
       '@bemedev/app-cli':
         specifier: ^0.1.7
-        version: 0.1.7(@bemedev/app-ts@2.5.2(@bemedev/types@0.4.2))(@bemedev/types@0.4.2)(vitest@3.2.4)
+        version: 0.1.7(@bemedev/app-ts@2.5.3(@bemedev/types@0.4.2))(@bemedev/types@0.4.2)(vitest@3.2.4)
       '@bemedev/app-ts':
-        specifier: ^2.5.2
-        version: 2.5.2(@bemedev/types@0.4.2)
+        specifier: ^2.5.3
+        version: 2.5.3(@bemedev/types@0.4.2)
       '@bemedev/decompose':
         specifier: 2.2.0
         version: 2.2.0(@bemedev/types@0.4.2)
       '@bemedev/dev-utils':
         specifier: ^0.5.3
-        version: 0.5.3(@vitest/coverage-v8@3.2.4(vitest@3.2.4))(rolldown@1.0.0-rc.16)(rollup@4.60.1)(typescript@6.0.2)(vite@8.0.8(@types/node@25.6.0)(esbuild@0.27.7))(vitest@3.2.4)
+        version: 0.5.3(@vitest/coverage-v8@3.2.4(vitest@3.2.4))(rolldown@1.0.0-rc.16)(rollup@4.60.1)(typescript@6.0.3)(vite@8.0.8(@types/node@25.6.0)(esbuild@0.27.7))(vitest@3.2.4)
       '@bemedev/fsf':
         specifier: ^1.0.1
         version: 1.0.1
@@ -79,7 +79,7 @@ importers:
         version: 1.0.0-rc.16
       rolldown-plugin-dts:
         specifier: ^0.23.2
-        version: 0.23.2(rolldown@1.0.0-rc.16)(typescript@6.0.2)
+        version: 0.23.2(rolldown@1.0.0-rc.16)(typescript@6.0.3)
       size-limit:
         specifier: ^12.1.0
         version: 12.1.0
@@ -90,8 +90,8 @@ importers:
         specifier: ^2.8.1
         version: 2.8.1
       typescript:
-        specifier: ^6.0.2
-        version: 6.0.2
+        specifier: ^6.0.3
+        version: 6.0.3
       vite-plugin-solid:
         specifier: ^2.11.12
         version: 2.11.12(@testing-library/jest-dom@6.9.1)(solid-js@1.9.12)(vite@8.0.8(@types/node@25.6.0)(esbuild@0.27.7))
@@ -240,8 +240,8 @@ packages:
     peerDependencies:
       '@bemedev/app-ts': ^0.9.20
 
-  '@bemedev/app-ts@2.5.2':
-    resolution: {integrity: sha512-jS68Hhnx2QWtQbbmRRP0nRZi1ZecRf94q6uKYT8t+2SyCyKVJf4ncrK5AG3aDWtP3L0w2b1PzZ++yg2qAdVBMg==}
+  '@bemedev/app-ts@2.5.3':
+    resolution: {integrity: sha512-HnBVC3192dd7KdYFUOHkYwva3VHjRIKjHYn1wHh4yC7qhhwRVjM9YAQc2Xpkc6C2gPvgFb8k5rIFmfXVX1luUQ==}
     engines: {node: '>=24'}
 
   '@bemedev/better-promise@0.1.1':
@@ -2387,8 +2387,8 @@ packages:
     peerDependencies:
       typescript: ^4.7.2 || ^5 || ^6
 
-  typescript@6.0.2:
-    resolution: {integrity: sha512-bGdAIrZ0wiGDo5l8c++HWtbaNCWTS4UTv7RaTH/ThVIgjkveJt83m74bBHMJkuCbslY8ixgLBVZJIOiQlQTjfQ==}
+  typescript@6.0.3:
+    resolution: {integrity: sha512-y2TvuxSZPDyQakkFRPZHKFm+KKVqIisdg9/CZwm9ftvKXLP8NRWj38/ODjNbr43SsoXqNuAisEf1GdCxqWcdBw==}
     engines: {node: '>=14.17'}
     hasBin: true
 
@@ -2755,9 +2755,9 @@ snapshots:
 
   '@bcoe/v8-coverage@1.0.2': {}
 
-  '@bemedev/app-cli@0.1.7(@bemedev/app-ts@2.5.2(@bemedev/types@0.4.2))(@bemedev/types@0.4.2)(vitest@3.2.4)':
+  '@bemedev/app-cli@0.1.7(@bemedev/app-ts@2.5.3(@bemedev/types@0.4.2))(@bemedev/types@0.4.2)(vitest@3.2.4)':
     dependencies:
-      '@bemedev/app-ts': 2.5.2(@bemedev/types@0.4.2)
+      '@bemedev/app-ts': 2.5.3(@bemedev/types@0.4.2)
       '@bemedev/decompose': 1.5.0(@bemedev/types@0.4.2)(vitest@3.2.4)
       chokidar: 4.0.3
       cmd-ts: 0.14.3
@@ -2769,7 +2769,7 @@ snapshots:
       - supports-color
       - vitest
 
-  '@bemedev/app-ts@2.5.2(@bemedev/types@0.4.2)':
+  '@bemedev/app-ts@2.5.3(@bemedev/types@0.4.2)':
     dependencies:
       '@bemedev/better-promise': 0.1.1
       '@bemedev/boolean-recursive': 0.0.3
@@ -2813,7 +2813,7 @@ snapshots:
       '@bemedev/types': 0.4.2
       ts-deepmerge: 7.0.3
 
-  '@bemedev/dev-utils@0.5.3(@vitest/coverage-v8@3.2.4(vitest@3.2.4))(rolldown@1.0.0-rc.16)(rollup@4.60.1)(typescript@6.0.2)(vite@8.0.8(@types/node@25.6.0)(esbuild@0.27.7))(vitest@3.2.4)':
+  '@bemedev/dev-utils@0.5.3(@vitest/coverage-v8@3.2.4(vitest@3.2.4))(rolldown@1.0.0-rc.16)(rollup@4.60.1)(typescript@6.0.3)(vite@8.0.8(@types/node@25.6.0)(esbuild@0.27.7))(vitest@3.2.4)':
     dependencies:
       '@vitest/coverage-v8': 3.2.4(vitest@3.2.4)
       cmd-ts: 0.15.0
@@ -2823,11 +2823,11 @@ snapshots:
       rollup-plugin-circular-dependencies: 2.0.1(rollup@4.60.1)
       rollup-plugin-node-externals: 9.0.1(rollup@4.60.1)(vite@8.0.8(@types/node@25.6.0)(esbuild@0.27.7))
       rollup-plugin-tsc-alias: 1.1.4(rollup@4.60.1)
-      rollup-plugin-tsconfig-paths: 1.5.2(rollup@4.60.1)(typescript@6.0.2)
+      rollup-plugin-tsconfig-paths: 1.5.2(rollup@4.60.1)(typescript@6.0.3)
       shelljs: 0.10.0
       sort-keys: 6.0.0
       tsc-alias: 1.8.16
-      typescript: 6.0.2
+      typescript: 6.0.3
       vitest: 3.2.4(@types/node@25.6.0)(@vitest/ui@3.2.4)(jsdom@29.0.2)(lightningcss@1.32.0)
     transitivePeerDependencies:
       - rollup
@@ -4290,7 +4290,7 @@ snapshots:
 
   reusify@1.1.0: {}
 
-  rolldown-plugin-dts@0.23.2(rolldown@1.0.0-rc.16)(typescript@6.0.2):
+  rolldown-plugin-dts@0.23.2(rolldown@1.0.0-rc.16)(typescript@6.0.3):
     dependencies:
       '@babel/generator': 8.0.0-rc.3
       '@babel/helper-validator-identifier': 8.0.0-rc.3
@@ -4304,7 +4304,7 @@ snapshots:
       picomatch: 4.0.4
       rolldown: 1.0.0-rc.16
     optionalDependencies:
-      typescript: 6.0.2
+      typescript: 6.0.3
     transitivePeerDependencies:
       - oxc-resolver
 
@@ -4365,10 +4365,10 @@ snapshots:
       rollup: 4.60.1
       tsc-alias: 1.8.16
 
-  rollup-plugin-tsconfig-paths@1.5.2(rollup@4.60.1)(typescript@6.0.2):
+  rollup-plugin-tsconfig-paths@1.5.2(rollup@4.60.1)(typescript@6.0.3):
     dependencies:
       rollup: 4.60.1
-      typescript-paths: 1.5.2(typescript@6.0.2)
+      typescript-paths: 1.5.2(typescript@6.0.3)
     transitivePeerDependencies:
       - typescript
 
@@ -4592,11 +4592,11 @@ snapshots:
 
   tslib@2.8.1: {}
 
-  typescript-paths@1.5.2(typescript@6.0.2):
+  typescript-paths@1.5.2(typescript@6.0.3):
     dependencies:
-      typescript: 6.0.2
+      typescript: 6.0.3
 
-  typescript@6.0.2: {}
+  typescript@6.0.3: {}
 
   undici-types@7.19.2: {}
 
